@@ -4,7 +4,7 @@
 
 This repository contains the Golang client to communicate with the Avisi Cloud Platform API.
 
-[Documentation](https://docs.avisi.cloud/)
+[Website](https://avisi.cloud) | [Documentation](https://docs.avisi.cloud)
 
 ## Installation
 
@@ -13,6 +13,13 @@ To make use of this go-client include it in your go.mod file, e.g.:
 ```bash
 go get github.com/avisi-cloud/go-client
 ```
+
+## Getting Started
+
+- [Get Started with Avisi Cloud](https://docs.avisi.cloud/docs/get-started/introduction/)
+- [Platform Overview](https://docs.avisi.cloud/product/introduction/)
+- [References](https://docs.avisi.cloud/references/references-overview/)
+- [Example](example)
 
 ## Usage
 
