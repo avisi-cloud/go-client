@@ -51,7 +51,7 @@ func (c *clientImpl) FindCloudAccountByName(ctx context.Context, org, name, clou
 		return nil, err
 	}
 	if len(cloudAccounts) == 0 {
-		return nil, fmt.Errorf("cloud account %s for cloud provider %s not found", name, cloudProvider)
+		return nil, fmt.Errorf("cloud account %q for cloud provider %q not found", name, cloudProvider)
 	}
 	result := cloudAccounts[0]
 
