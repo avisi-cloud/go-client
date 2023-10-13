@@ -54,15 +54,11 @@ type NodePoolsAPI interface {
 
 type CloudAccountsAPI interface {
 	GetCloudAccounts(ctx context.Context, org string) ([]CloudAccount, error)
-	GetCloudAccount(ctx context.Context, org, displayName, cloudProvider string) (*CloudAccount, error)
+	FindCloudAccountByName(ctx context.Context, org, name, cloudProvider string) (*CloudAccount, error)
 }
 
 type MembershipsAPI interface {
 	GetMemberships(ctx context.Context) ([]Membership, error)
-}
-
-type ServiceLevelAgreementsAPI interface {
-	GetServiceLevelAgreements(ctx context.Context) ([]ServiceLevelAgreement, error)
 }
 
 type UpdateChannelAPI interface {
@@ -92,7 +88,6 @@ type Client interface {
 	EnvironmentsAPI
 	NodePoolsAPI
 	MembershipsAPI
-	ServiceLevelAgreementsAPI
 	UpdateChannelAPI
 	ObservabilityAPI
 	OrganisationAPI

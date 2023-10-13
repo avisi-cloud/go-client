@@ -36,8 +36,8 @@ func (c *clientImpl) GetCloudAccounts(ctx context.Context, org string) ([]CloudA
 	return MarshalPagedResultContent[CloudAccount](pagedResult)
 }
 
-func (c *clientImpl) GetCloudAccount(ctx context.Context, org, displayName, cloudProvider string) (*CloudAccount, error) {
-	pagedResult, err := c.GetPaged(ctx, fmt.Sprintf("/api/v1/orgs/%s/cloud-accounts?display-name=%s&cloud-provider-slug=%s", org, displayName, cloudProvider))
+func (c *clientImpl) FindCloudAccountByName(ctx context.Context, org, name, cloudProvider string) (*CloudAccount, error) {
+	pagedResult, err := c.GetPaged(ctx, fmt.Sprintf("/api/v1/orgs/%s/cloud-accounts?display-name=%s&cloud-provider-slug=%s", org, name, cloudProvider))
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,12 @@ func (c *clientImpl) GetCloudAccount(ctx context.Context, org, displayName, clou
 	}
 
 	cloudAccounts, err := MarshalPagedResultContent[CloudAccount](pagedResult)
-
+	if err != nil {
+		return nil, err
+	}
+	if len(cloudAccounts) == 0 {
+		return nil, fmt.Errorf("cloud account %q for cloud provider %q not found", name, cloudProvider)
+	}
 	result := cloudAccounts[0]
 
 	return &result, nil
