@@ -28,21 +28,21 @@ go get github.com/avisi-cloud/go-client
 To create a client that uses a personal access token (PAT) for authentication we first need to create a NewPersonalAccessTokenAuthenticator to which you pass in the PAT, e.g.:
 
 ```go
-	authenticator := acloudapi.NewPersonalAccessTokenAuthenticator(token)
+authenticator := acloudapi.NewPersonalAccessTokenAuthenticator(token)
 ```
 
 Then we create a `ClientOpts` object in which you configure the URL of the Avisi Cloud Platform API you want to connect to, e.g.:
 
 ```go
-	clientOpts := acloudapi.ClientOpts{
-		APIUrl: "https://example.com",
-	}
+clientOpts := acloudapi.ClientOpts{
+	APIUrl: "https://example.com",
+}
 ```
 
 Next, create a `NewCLient`, using the `Authenticator` and `ClientOpts` created in the previous steps:
 
 ```go
-	c := acloudapi.NewClient(authenticator, clientOpts)
+c := acloudapi.NewClient(authenticator, clientOpts)
 ```
 
 ### Example
@@ -50,26 +50,26 @@ Next, create a `NewCLient`, using the `Authenticator` and `ClientOpts` created i
 Full example:
 
 ```go
-	personalAccessToken := os.Getenv("ACLOUD_PERSONAL_ACCESS_TOKEN")
-	authenticator := acloudapi.NewPersonalAccessTokenAuthenticator(personalAccessToken)
-	clientOpts := acloudapi.ClientOpts{
-		APIUrl: "https://example.com",
-	}
-	c := acloudapi.NewClient(authenticator, clientOpts)
+personalAccessToken := os.Getenv("ACLOUD_PERSONAL_ACCESS_TOKEN")
+authenticator := acloudapi.NewPersonalAccessTokenAuthenticator(personalAccessToken)
+clientOpts := acloudapi.ClientOpts{
+	APIUrl: "https://example.com",
+}
+c := acloudapi.NewClient(authenticator, clientOpts)
 
-	createEnvironment := acloudapi.CreateEnvironment{
-		Name:        "name",
-		Type:        "staging",
-		Description: "a description of the environment",
-	}
+createEnvironment := acloudapi.CreateEnvironment{
+	Name:        "name",
+	Type:        "staging",
+	Description: "a description of the environment",
+}
 
-	org := "organisation-slug"
-	environment, err := client.CreateEnvironment(ctx, createEnvironment, org)
+org := "organisation-slug"
+environment, err := client.CreateEnvironment(ctx, createEnvironment, org)
 
-	if err != nil {
-		return err
-	}
-	// environment has been created
+if err != nil {
+	return err
+}
+// environment has been created
 ```
 
 ## License
