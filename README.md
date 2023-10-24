@@ -55,7 +55,7 @@ authenticator := acloudapi.NewPersonalAccessTokenAuthenticator(personalAccessTok
 clientOpts := acloudapi.ClientOpts{
 	APIUrl: "https://example.com",
 }
-c := acloudapi.NewClient(authenticator, clientOpts)
+client := acloudapi.NewClient(authenticator, clientOpts)
 
 createEnvironment := acloudapi.CreateEnvironment{
 	Name:        "name",
@@ -64,7 +64,7 @@ createEnvironment := acloudapi.CreateEnvironment{
 }
 
 org := "organisation-slug"
-environment, err := client.CreateEnvironment(ctx, createEnvironment, org)
+environment, err := client.CreateEnvironment(context.Background(), createEnvironment, org)
 
 if err != nil {
 	return err
