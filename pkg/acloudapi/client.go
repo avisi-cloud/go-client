@@ -17,6 +17,7 @@ type ClusterAPI interface {
 	CreateCluster(ctx context.Context, organisationSlug, environmentSlug string, create CreateCluster) (*Cluster, error)
 	UpdateCluster(ctx context.Context, organisationSlug, environmentSlug, clusterSlug string, update UpdateCluster) (*Cluster, error)
 	DeleteCluster(ctx context.Context, organisationSlug, environmentSlug, clusterSlug string, update UpdateCluster) error
+	WaitUntilClusterIsRunning(ctx context.Context, orgSlug string, cluster Cluster) error
 }
 
 type ClusterVersionAPI interface {

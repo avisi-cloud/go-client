@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 )
 
 type clustersResponse struct {
@@ -249,4 +250,58 @@ func False() *bool {
 
 func True() *bool {
 	return BoolPointer(true)
+}
+
+func (c *clientImpl) WaitUntilClusterIsRunning(ctx context.Context, orgSlug string, cluster Cluster) error {
+
+	// Note: API returns running for started clusters, while the actual status is started. The actual status should be fixed and use running instead.
+	// This also means this check could potentially break / timeout
+	return c.WaitUntilClusterHasStatus(ctx, orgSlug, cluster.EnvironmentSlug, cluster.Slug, "running", 10*time.Minute)
+}
+
+func (c *clientImpl) WaitUntilClusterHasStatus(ctx context.Context, orgSlug, envSlug, clusterSlug, status string, timeout time.Duration) error {
+	clstr, err := c.GetCluster(ctx, orgSlug, envSlug, clusterSlug)
+	if err == nil {
+		if clstr.Status == status {
+			return nil
+		}
+	}
+	fmt.Printf("Waiting until cluster is in status %q...\n", status)
+	previousStatus := ""
+
+	return Eventually(ctx, func(ctx context.Context) error {
+		clstr, err := c.GetCluster(ctx, orgSlug, envSlug, clusterSlug)
+		if err != nil {
+			return err
+		}
+		if previousStatus != clstr.Status {
+			previousStatus = clstr.Status
+			fmt.Printf("Cluster status: %s\n", clstr.Status)
+		}
+
+		if clstr.Status != status {
+			return fmt.Errorf("cluster has not reached status")
+		}
+		return nil
+	}, timeout)
+}
+
+func Eventually(ctx context.Context, f func(ctx context.Context) error, timeout time.Duration) error {
+	withTimeout, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	for {
+		select {
+		case <-withTimeout.Done():
+			return withTimeout.Err()
+		case <-time.After(10 * time.Second):
+			err := f(withTimeout)
+			if err != nil {
+				// TODO: break on unrecoverable errors, such as 401's
+				continue
+			}
+			withTimeout.Done()
+			return nil
+		}
+	}
 }
