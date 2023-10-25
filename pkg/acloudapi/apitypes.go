@@ -169,6 +169,22 @@ type NodeTaint struct {
 	Effect string `json:"effect"`
 }
 
+type NodePoolJoinConfig struct {
+	Versions                NodeJoinConfigVersions `json:"versions"`
+	CloudInitUserDataBase64 string                 `json:"cloudInitUserDataBase64"`
+	InstallScriptBase64     string                 `json:"installScriptBase64"`
+	UpgradeScriptBase64     string                 `json:"upgradeScriptBase64"`
+	JoinCommand             string                 `json:"joinCommand"`
+	KubeletConfigBase64     string                 `json:"kubeletConfigBase64"`
+}
+
+type NodeJoinConfigVersions struct {
+	CloudInit  string `json:"cloudInit"`
+	Kubernetes string `json:"kubernetes"`
+	Containerd string `json:"containerd"`
+	Crictl     string `json:"crictl"`
+}
+
 func (n NodePool) FullIdentifier() string {
 	c := n.Cluster
 	return fmt.Sprintf("%s/%s/%s/%s (%d)", c.CustomerSlug, c.EnvironmentSlug, c.Slug, n.Name, n.ID)

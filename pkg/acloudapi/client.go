@@ -47,6 +47,7 @@ type NodePoolsAPI interface {
 	GetNodePoolsByOrg(ctx context.Context, organisationSlug string) ([]NodePool, error)
 	GetNodePoolsByCluster(ctx context.Context, cluster Cluster) ([]NodePool, error)
 	GetNodePoolsByClusters(ctx context.Context, clusters []Cluster) ([]NodePool, error)
+	GetNodePoolJoinConfig(ctx context.Context, cluster Cluster, nodePool NodePool) (*NodePoolJoinConfig, error)
 	CreateNodePool(ctx context.Context, cluster Cluster, create CreateNodePool) (*NodePool, error)
 	UpdateNodePool(ctx context.Context, cluster Cluster, nodePoolID int, update CreateNodePool) (*NodePool, error)
 	DeleteNodePool(ctx context.Context, cluster Cluster, nodePoolID int) error
