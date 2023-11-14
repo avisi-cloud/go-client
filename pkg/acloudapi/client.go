@@ -75,6 +75,10 @@ type ObservabilityAPI interface {
 	AddObservabilityTenantPrometheusRules(ctx context.Context, org, slug string, rules []PrometheusRules, force bool) error
 	OverwriteObservabilityTenantPrometheusRules(ctx context.Context, org, slug string, rules []PrometheusRules) error
 	DeleteObservabilityTenantPrometheusRules(ctx context.Context, org, slug string, names []string) error
+
+	GetSilences(ctx context.Context, org, observabilityTenantSlug string) ([]Silence, error)
+	CreateSilence(ctx context.Context, createSilence CreateSilence, org, observabilityTenantSlug string) (*Silence, error)
+	ExpireSilence(ctx context.Context, org, observabilityTenantSlug, silenceID string) error
 }
 
 type OrganisationAPI interface {
