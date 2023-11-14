@@ -300,3 +300,31 @@ type UpdateChannelResponse struct {
 	Available                bool   `json:"available" yaml:"Available"`
 	KubernetesClusterVersion string `json:"kubernetesClusterVersion" yaml:"Version"`
 }
+
+type CreateSilence struct {
+	Matchers []SilenceMatcher `json:"matchers"`
+	StartsAt time.Time        `json:"startsAt"`
+	EndsAt   time.Time        `json:"endsAt"`
+	Comment  string           `json:"comment"`
+}
+
+type Silence struct {
+	Id        string           `json:"id"`
+	Matchers  []SilenceMatcher `json:"matchers"`
+	StartsAt  time.Time        `json:"startsAt"`
+	EndsAt    time.Time        `json:"endsAt"`
+	CreatedBy string           `json:"createdBy"`
+	Comment   string           `json:"comment"`
+	Status    SilenceStatus    `json:"status"`
+}
+
+type SilenceStatus struct {
+	State string `json:"state"`
+}
+
+type SilenceMatcher struct {
+	Name    string `json:"name"`
+	Value   string `json:"value"`
+	IsRegex bool   `json:"isRegex"`
+	IsEqual bool   `json:"isEqual"`
+}
