@@ -34,7 +34,6 @@ type Cluster struct {
 	DeletedAt                    *time.Time                 `json:"deletedAt" yaml:"DeletedAt,omitempty"`
 	Memory                       int                        `json:"memory" yaml:"Memory"`
 	CPU                          int                        `json:"cpu" yaml:"CPU"`
-	SLA                          string                     `json:"sla" yaml:"SLA"`
 	IPWhitelist                  []IpWhitelistResponse      `json:"ipWhitelist" yaml:"IPWhitelist,omitempty"`
 	AmeOIDC                      bool                       `json:"ameOIDC" yaml:"AmeOIDC"`
 	DeleteProtection             bool                       `json:"deleteProtection" yaml:"DeleteProtection"`
@@ -102,8 +101,6 @@ type CreateCluster struct {
 	EnableMultiAvailabilityZones bool `json:"enableMultiAvailabilityZones"`
 	EnableAutoUpgrade            bool `json:"enableAutoUpgrade"`
 	EnableHighAvailability       bool `json:"enableHighAvailability"`
-
-	SLA string `json:"sla,omitempty"`
 
 	ServiceSubnet    string `json:"serviceSubnet,omitempty"`
 	ClusterPodSubnet string `json:"clusterPodSubnet,omitempty"`
