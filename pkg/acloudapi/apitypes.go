@@ -86,56 +86,56 @@ type APIAddon struct {
 }
 
 type CreateCluster struct {
-	Name                 string `json:"name"`
-	EnvironmentID        string `json:"environmentId"`
-	Description          string `json:"description,omitempty"`
-	CloudAccountIdentity string `json:"cloudAccountIdentity"`
-	Region               string `json:"region"`
+	Name                 string `json:"name" yaml:"Name"`
+	EnvironmentID        string `json:"environmentId" yaml:"EnvironmentId"`
+	Description          string `json:"description,omitempty" yaml:"Description,omitempty"`
+	CloudAccountIdentity string `json:"cloudAccountIdentity" yaml:"CloudAccountIdentity"`
+	Region               string `json:"region" yaml:"Region"`
 
-	Version       string `json:"version,omitempty"`
-	UpdateChannel string `json:"updateChannel,omitempty"`
+	Version       string `json:"version,omitempty" yaml:"Version,omitempty"`
+	UpdateChannel string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
 
-	EnableNATGateway             bool `json:"enableNATGateway"`
-	EnableNetworkEncryption      bool `json:"enableNetworkEncryption"`
-	EnablePodSecurityStandards   bool `json:"enablePodSecurityStandards"`
-	EnableMultiAvailabilityZones bool `json:"enableMultiAvailabilityZones"`
-	EnableAutoUpgrade            bool `json:"enableAutoUpgrade"`
-	EnableHighAvailability       bool `json:"enableHighAvailability"`
+	EnableNATGateway             bool `json:"enableNATGateway" yaml:"EnableNATGateway"`
+	EnableNetworkEncryption      bool `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
+	EnablePodSecurityStandards   bool `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
+	EnableMultiAvailabilityZones bool `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
+	EnableAutoUpgrade            bool `json:"enableAutoUpgrade" yaml:"EnableAutoUpgrade"`
+	EnableHighAvailability       bool `json:"enableHighAvailability" yaml:"EnableHighAvailability"`
 
-	ServiceSubnet    string `json:"serviceSubnet,omitempty"`
-	ClusterPodSubnet string `json:"clusterPodSubnet,omitempty"`
+	ServiceSubnet    string `json:"serviceSubnet,omitempty" yaml:"ServiceSubnet,omitempty"`
+	ClusterPodSubnet string `json:"clusterPodSubnet,omitempty" yaml:"ClusterPodSubnet,omitempty"`
 
-	NodePools   []NodePools         `json:"nodePools"`
-	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty"`
-	Addons      map[string]APIAddon `json:"addons,omitempty"`
+	NodePools   []NodePools         `json:"nodePools" yaml:"NodePools"`
+	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 }
 
 type IPWhitelistEntry struct {
-	Cidr        string `json:"cidr"`
-	Description string `json:"description,omitempty"`
+	Cidr        string `json:"cidr" yaml:"Cidr"`
+	Description string `json:"description,omitempty" yaml:"Description,omitempty"`
 }
 
 type UpdateCluster struct {
-	Status                     string              `json:"status,omitempty"`
-	Version                    string              `json:"version,omitempty"`
-	UpdateChannel              string              `json:"updateChannel,omitempty"`
-	EnableNetworkProxy         *bool               `json:"enableNetworkProxy,omitempty"`
-	EnableNetworkEncryption    *bool               `json:"enableNetworkEncryption,omitempty"`
-	EnableAutoUpgrade          *bool               `json:"enableAutoUpgrade,omitempty"`
-	EnableHighAvailability     *bool               `json:"enableHighAvailability,omitempty"`
-	EnablePodSecurityStandards *bool               `json:"enablePodSecurityStandards,omitempty"`
-	IPWhitelist                []string            `json:"ipWhitelist,omitempty"`
-	Addons                     map[string]APIAddon `json:"addons,omitempty"`
+	Status                     string              `json:"status,omitempty" yaml:"Status,omitempty"`
+	Version                    string              `json:"version,omitempty" yaml:"Version,omitempty"`
+	UpdateChannel              string              `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
+	EnableNetworkProxy         *bool               `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
+	EnableNetworkEncryption    *bool               `json:"enableNetworkEncryption,omitempty" yaml:"EnableNetworkEncryption,omitempty"`
+	EnableAutoUpgrade          *bool               `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
+	EnableHighAvailability     *bool               `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
+	EnablePodSecurityStandards *bool               `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
+	IPWhitelist                []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	Addons                     map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 }
 
 // NodePools is used by CreateCluster
 type NodePools struct {
-	Name             string `json:"name"`
-	AutoScaling      bool   `json:"autoScaling"`
-	MinSize          int    `json:"minSize"`
-	MaxSize          int    `json:"maxSize"`
-	NodeSize         string `json:"nodeSize"`
-	AvailabilityZone string `json:"availabilityZone,omitempty"`
+	Name             string `json:"name" yaml:"Name"`
+	AutoScaling      bool   `json:"autoScaling" yaml:"AutoScaling"`
+	MinSize          int    `json:"minSize" yaml:"MinSize"`
+	MaxSize          int    `json:"maxSize" yaml:"MaxSize"`
+	NodeSize         string `json:"nodeSize" yaml:"NodeSize"`
+	AvailabilityZone string `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
 }
 
 type NodePool struct {
@@ -161,25 +161,25 @@ type NodePool struct {
 }
 
 type NodeTaint struct {
-	Key    string `json:"key"`
-	Value  string `json:"value"`
-	Effect string `json:"effect"`
+	Key    string `json:"key" yaml:"Key"`
+	Value  string `json:"value" yaml:"Value"`
+	Effect string `json:"effect" yaml:"Effect"`
 }
 
 type NodePoolJoinConfig struct {
-	Versions                NodeJoinConfigVersions `json:"versions"`
-	CloudInitUserDataBase64 string                 `json:"cloudInitUserDataBase64"`
-	InstallScriptBase64     string                 `json:"installScriptBase64"`
-	UpgradeScriptBase64     string                 `json:"upgradeScriptBase64"`
-	JoinCommand             string                 `json:"joinCommand"`
-	KubeletConfigBase64     string                 `json:"kubeletConfigBase64"`
+	Versions                NodeJoinConfigVersions `json:"versions" yaml:"Versions"`
+	CloudInitUserDataBase64 string                 `json:"cloudInitUserDataBase64" yaml:"CloudInitUserDataBase64"`
+	InstallScriptBase64     string                 `json:"installScriptBase64" yaml:"InstallScriptBase64"`
+	UpgradeScriptBase64     string                 `json:"upgradeScriptBase64" yaml:"UpgradeScriptBase64"`
+	JoinCommand             string                 `json:"joinCommand" yaml:"JoinCommand"`
+	KubeletConfigBase64     string                 `json:"kubeletConfigBase64" yaml:"KubeletConfigBase64"`
 }
 
 type NodeJoinConfigVersions struct {
-	CloudInit  string `json:"cloudInit"`
-	Kubernetes string `json:"kubernetes"`
-	Containerd string `json:"containerd"`
-	Crictl     string `json:"crictl"`
+	CloudInit  string `json:"cloudInit" yaml:"CloudInit"`
+	Kubernetes string `json:"kubernetes" yaml:"Kubernetes"`
+	Containerd string `json:"containerd" yaml:"Containerd"`
+	Crictl     string `json:"crictl" yaml:"Crictl"`
 }
 
 func (n NodePool) FullIdentifier() string {
@@ -188,108 +188,108 @@ func (n NodePool) FullIdentifier() string {
 }
 
 type CreateNodePool struct {
-	Name                string            `json:"name"`
-	AvailabilityZone    string            `json:"availabilityZone,omitempty"`
-	NodeSize            string            `json:"nodeSize"`
-	MinSize             int               `json:"minSize"`
-	MaxSize             int               `json:"maxSize"`
-	AutoScaling         bool              `json:"autoScaling"`
-	NodeAutoReplacement bool              `json:"enableNodeAutoReplacement"`
-	Annotations         map[string]string `json:"annotations"`
-	Labels              map[string]string `json:"labels"`
-	Taints              []NodeTaint       `json:"taints"`
+	Name                string            `json:"name" yaml:"Name"`
+	AvailabilityZone    string            `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
+	NodeSize            string            `json:"nodeSize" yaml:"NodeSize"`
+	MinSize             int               `json:"minSize" yaml:"MinSize"`
+	MaxSize             int               `json:"maxSize" yaml:"MaxSize"`
+	AutoScaling         bool              `json:"autoScaling" yaml:"AutoScaling"`
+	NodeAutoReplacement bool              `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
+	Annotations         map[string]string `json:"annotations" yaml:"Annotations"`
+	Labels              map[string]string `json:"labels" yaml:"Labels"`
+	Taints              []NodeTaint       `json:"taints" yaml:"Taints"`
 }
 
 type ClusterMetadataResponse struct {
-	Endpoint      string `json:"endpoint"`
-	CACertificate string `json:"caCertificate"`
-	ClientID      string `json:"clientId"`
-	ClientSecret  string `json:"clientSecret"`
-	IssuerUrl     string `json:"issuerUrl"`
+	Endpoint      string `json:"endpoint" yaml:"Endpoint"`
+	CACertificate string `json:"caCertificate" yaml:"CaCertificate"`
+	ClientID      string `json:"clientId" yaml:"ClientId"`
+	ClientSecret  string `json:"clientSecret" yaml:"ClientSecret"`
+	IssuerUrl     string `json:"issuerUrl" yaml:"IssuerUrl"`
 }
 
 type ClusterVersion struct {
-	Version string `json:"version"`
+	Version string `json:"version" yaml:"Version"`
 }
 
 type Membership struct {
-	Email string `json:"email"`
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Slug  string `json:"slug"`
+	Email string `json:"email" yaml:"Email"`
+	ID    string `json:"id" yaml:"Id"`
+	Name  string `json:"name" yaml:"Name"`
+	Slug  string `json:"slug" yaml:"Slug"`
 }
 
 type CloudProvider struct {
-	ID         int       `json:"id"`
-	Name       string    `json:"name"`
-	Slug       string    `json:"slug"`
-	Available  bool      `json:"available"`
-	CreatedAt  time.Time `json:"createdAt"`
-	ModifiedAt time.Time `json:"modifiedAt"`
+	ID         int       `json:"id" yaml:"Id"`
+	Name       string    `json:"name" yaml:"Name"`
+	Slug       string    `json:"slug" yaml:"Slug"`
+	Available  bool      `json:"available" yaml:"Available"`
+	CreatedAt  time.Time `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt time.Time `json:"modifiedAt" yaml:"ModifiedAt"`
 }
 
 type Region struct {
-	ID         int       `json:"id"`
-	Provider   string    `json:"provider"`
-	Name       string    `json:"name"`
-	Slug       string    `json:"slug"`
-	Available  bool      `json:"available"`
-	Restricted bool      `json:"restricted"`
-	CreatedAt  time.Time `json:"createdAt"`
-	ModifiedAt time.Time `json:"modifiedAt"`
+	ID         int       `json:"id" yaml:"Id"`
+	Provider   string    `json:"provider" yaml:"Provider"`
+	Name       string    `json:"name" yaml:"Name"`
+	Slug       string    `json:"slug" yaml:"Slug"`
+	Available  bool      `json:"available" yaml:"Available"`
+	Restricted bool      `json:"restricted" yaml:"Restricted"`
+	CreatedAt  time.Time `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt time.Time `json:"modifiedAt" yaml:"ModifiedAt"`
 }
 
 type AvailabilityZone struct {
-	ID         int       `json:"id"`
-	Name       string    `json:"name"`
-	Slug       string    `json:"slug"`
-	CreatedAt  time.Time `json:"createdAt"`
-	ModifiedAt time.Time `json:"modifiedAt"`
+	ID         int       `json:"id" yaml:"Id"`
+	Name       string    `json:"name" yaml:"Name"`
+	Slug       string    `json:"slug" yaml:"Slug"`
+	CreatedAt  time.Time `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt time.Time `json:"modifiedAt" yaml:"ModifiedAt"`
 }
 
 type ServiceLevelAgreement struct {
-	Slug        string    `json:"slug"`
-	Name        string    `json:"name"`
-	Value       int       `json:"value"`
-	AutoUpgrade bool      `json:"autoUpgrade"`
-	CreatedAt   time.Time `json:"createdAt"`
-	ModifiedAt  time.Time `json:"modifiedAt"`
+	Slug        string    `json:"slug" yaml:"Slug"`
+	Name        string    `json:"name" yaml:"Name"`
+	Value       int       `json:"value" yaml:"Value"`
+	AutoUpgrade bool      `json:"autoUpgrade" yaml:"AutoUpgrade"`
+	CreatedAt   time.Time `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt  time.Time `json:"modifiedAt" yaml:"ModifiedAt"`
 }
 
 type Environment struct {
-	ID               int        `json:"id"`
-	Name             string     `json:"name"`
-	Purpose          string     `json:"purpose"`
-	Type             string     `json:"type"`
-	Description      string     `json:"description"`
-	CreatedAt        time.Time  `json:"createdAt"`
-	ModifiedAt       time.Time  `json:"modifiedAt"`
-	DeletedAt        *time.Time `json:"deletedAt"`
-	TotalClusters    int        `json:"totalClusters"`
-	TotalCPU         int        `json:"totalCpu"`
-	TotalMemory      int        `json:"totalMemory"`
-	Slug             string     `json:"slug"`
-	OrganisationSlug string     `json:"organisationSlug"`
+	ID               int        `json:"id" yaml:"Id"`
+	Name             string     `json:"name" yaml:"Name"`
+	Purpose          string     `json:"purpose" yaml:"Purpose"`
+	Type             string     `json:"type" yaml:"Type"`
+	Description      string     `json:"description" yaml:"Description"`
+	CreatedAt        time.Time  `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt       time.Time  `json:"modifiedAt" yaml:"ModifiedAt"`
+	DeletedAt        *time.Time `json:"deletedAt" yaml:"DeletedAt"`
+	TotalClusters    int        `json:"totalClusters" yaml:"TotalClusters"`
+	TotalCPU         int        `json:"totalCpu" yaml:"TotalCpu"`
+	TotalMemory      int        `json:"totalMemory" yaml:"TotalMemory"`
+	Slug             string     `json:"slug" yaml:"Slug"`
+	OrganisationSlug string     `json:"organisationSlug" yaml:"OrganisationSlug"`
 }
 
 type CreateEnvironment struct {
-	Name        string `json:"name"`
-	Purpose     string `json:"purpose"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
+	Name        string `json:"name" yaml:"Name"`
+	Purpose     string `json:"purpose" yaml:"Purpose"`
+	Type        string `json:"type" yaml:"Type"`
+	Description string `json:"description" yaml:"Description"`
 }
 
 type UpdateEnvironment struct {
-	Name        string `json:"name"`
-	Purpose     string `json:"purpose"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
+	Name        string `json:"name" yaml:"Name"`
+	Purpose     string `json:"purpose" yaml:"Purpose"`
+	Type        string `json:"type" yaml:"Type"`
+	Description string `json:"description" yaml:"Description"`
 }
 
 type NodeType struct {
-	Type   string `json:"type"`
-	CPU    int    `json:"cpu"`
-	Memory int    `json:"memory"`
+	Type   string `json:"type" yaml:"Type"`
+	CPU    int    `json:"cpu" yaml:"Cpu"`
+	Memory int    `json:"memory" yaml:"Memory"`
 }
 
 type UpdateChannelResponse struct {
@@ -299,29 +299,29 @@ type UpdateChannelResponse struct {
 }
 
 type CreateSilence struct {
-	Matchers []SilenceMatcher `json:"matchers"`
-	StartsAt time.Time        `json:"startsAt"`
-	EndsAt   time.Time        `json:"endsAt"`
-	Comment  string           `json:"comment"`
+	Matchers []SilenceMatcher `json:"matchers" yaml:"Matchers"`
+	StartsAt time.Time        `json:"startsAt" yaml:"StartsAt"`
+	EndsAt   time.Time        `json:"endsAt" yaml:"EndsAt"`
+	Comment  string           `json:"comment" yaml:"Comment"`
 }
 
 type Silence struct {
-	Id        string           `json:"id"`
-	Matchers  []SilenceMatcher `json:"matchers"`
-	StartsAt  time.Time        `json:"startsAt"`
-	EndsAt    time.Time        `json:"endsAt"`
-	CreatedBy string           `json:"createdBy"`
-	Comment   string           `json:"comment"`
-	Status    SilenceStatus    `json:"status"`
+	Id        string           `json:"id" yaml:"Id"`
+	Matchers  []SilenceMatcher `json:"matchers" yaml:"Matchers"`
+	StartsAt  time.Time        `json:"startsAt" yaml:"StartsAt"`
+	EndsAt    time.Time        `json:"endsAt" yaml:"EndsAt"`
+	CreatedBy string           `json:"createdBy" yaml:"CreatedBy"`
+	Comment   string           `json:"comment" yaml:"Comment"`
+	Status    SilenceStatus    `json:"status" yaml:"Status"`
 }
 
 type SilenceStatus struct {
-	State string `json:"state"`
+	State string `json:"state" yaml:"State"`
 }
 
 type SilenceMatcher struct {
-	Name    string `json:"name"`
-	Value   string `json:"value"`
-	IsRegex bool   `json:"isRegex"`
-	IsEqual bool   `json:"isEqual"`
+	Name    string `json:"name" yaml:"Name"`
+	Value   string `json:"value" yaml:"Value"`
+	IsRegex bool   `json:"isRegex" yaml:"IsRegex"`
+	IsEqual bool   `json:"isEqual" yaml:"IsEqual"`
 }
