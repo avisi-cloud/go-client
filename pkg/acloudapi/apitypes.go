@@ -5,53 +5,60 @@ import (
 	"time"
 )
 
+// Cluster represents the Cluster resource in the Avisi Cloud API
 type Cluster struct {
-	Name                         string                     `json:"name" yaml:"Name"`
-	Identity                     string                     `json:"identity" yaml:"Identity"`
-	EnvironmentIdentity          string                     `json:"environmentIdentity" yaml:"EnvironmentIdentity"`
-	EnvironmentSlug              string                     `json:"environmentSlug" yaml:"EnvironmentSlug"`
-	CustomerIdentity             string                     `json:"customerIdentity" yaml:"CustomerIdentity"`
-	CustomerSlug                 string                     `json:"customerSlug" yaml:"CustomerSlug"`
-	Slug                         string                     `json:"slug" yaml:"Slug"`
-	Description                  string                     `json:"description" yaml:"Description,omitempty"`
-	CloudProvider                string                     `json:"cloudProvider" yaml:"CloudProvider"`
-	CloudAccount                 *CloudAccountReference     `json:"cloudAccount" yaml:"CloudAccount,omitempty"`
-	CloudCredentials             *CloudCredentialsReference `json:"cloudCredentials" yaml:"CloudCredentials,omitempty"`
-	Region                       string                     `json:"region" yaml:"Region"`
-	Version                      string                     `json:"version" yaml:"Version"`
-	UpdateChannel                *UpdateChannelResponse     `json:"updateChannel" yaml:"UpdateChannel,omitempty"`
-	AutoUpgrade                  bool                       `json:"autoUpgrade" yaml:"AutoUpgrade"`
-	HighlyAvailable              bool                       `json:"highlyAvailable" yaml:"HighlyAvailable"`
-	EnableNetworkEncryption      bool                       `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
-	EnablePodSecurityStandards   bool                       `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
-	EnableMultiAvailAbilityZones bool                       `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
-	EnableNATGateway             bool                       `json:"enableNATGateway" yaml:"EnableNATGateway"`
-	Status                       string                     `json:"status" yaml:"Status,omitempty"`
-	DesiredStatus                string                     `json:"desiredStatus" yaml:"-"` // TODO: hidden for now in yaml since it is confusing
-	ProvisionStatus              ClusterProvisionStatus     `json:"provisionStatus" yaml:"ProvisionStatus"`
-	CreatedAt                    time.Time                  `json:"createdAt" yaml:"CreatedAt"`
-	ModifiedAt                   time.Time                  `json:"modifiedAt" yaml:"ModifiedAt"`
-	DeletedAt                    *time.Time                 `json:"deletedAt" yaml:"DeletedAt,omitempty"`
-	Memory                       int                        `json:"memory" yaml:"Memory"`
-	CPU                          int                        `json:"cpu" yaml:"CPU"`
-	IPWhitelist                  []IpWhitelistResponse      `json:"ipWhitelist" yaml:"IPWhitelist,omitempty"`
-	AmeOIDC                      bool                       `json:"ameOIDC" yaml:"AmeOIDC"`
-	DeleteProtection             bool                       `json:"deleteProtection" yaml:"DeleteProtection"`
-	Addons                       map[string]APIAddon        `json:"addons" yaml:"Addons,omitempty"`
-	ObservabilityTenant          *ObservabilityTenant       `json:"observabilityTenant,omitempty" yaml:"ObservabilityTenant,omitempty"`
-	EnvironmentPrometheusRules   bool                       `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
+	Name                    string                     `json:"name" yaml:"Name"`
+	Identity                string                     `json:"identity" yaml:"Identity"`
+	EnvironmentIdentity     string                     `json:"environmentIdentity" yaml:"EnvironmentIdentity"`
+	EnvironmentSlug         string                     `json:"environmentSlug" yaml:"EnvironmentSlug"`
+	CustomerIdentity        string                     `json:"customerIdentity" yaml:"CustomerIdentity"`
+	CustomerSlug            string                     `json:"customerSlug" yaml:"CustomerSlug"`
+	Slug                    string                     `json:"slug" yaml:"Slug"`
+	CNI                     string                     `json:"cni" yaml:"CNI"`
+	Description             string                     `json:"description" yaml:"Description,omitempty"`
+	CloudProvider           string                     `json:"cloudProvider" yaml:"CloudProvider"`
+	CloudAccount            *CloudAccountReference     `json:"cloudAccount" yaml:"CloudAccount,omitempty"`
+	CloudCredentials        *CloudCredentialsReference `json:"cloudCredentials" yaml:"CloudCredentials,omitempty"`
+	Region                  string                     `json:"region" yaml:"Region"`
+	Version                 string                     `json:"version" yaml:"Version"`
+	UpdateChannel           *UpdateChannelResponse     `json:"updateChannel" yaml:"UpdateChannel,omitempty"`
+	AutoUpgrade             bool                       `json:"autoUpgrade" yaml:"AutoUpgrade"`
+	HighlyAvailable         bool                       `json:"highlyAvailable" yaml:"HighlyAvailable"`
+	EnableNetworkEncryption bool                       `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
+	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
+	EnablePodSecurityStandards   bool                   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
+	PodSecurityStandardsProfile  string                 `json:"podSecurityStandardsProfile" yaml:"PodSecurityStandardsProfile"`
+	EnableMultiAvailAbilityZones bool                   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
+	EnableNATGateway             bool                   `json:"enableNATGateway" yaml:"EnableNATGateway"`
+	Status                       string                 `json:"status" yaml:"Status,omitempty"`
+	DesiredStatus                string                 `json:"desiredStatus" yaml:"-"` // TODO: hidden for now in yaml since it is confusing
+	ProvisionStatus              ClusterProvisionStatus `json:"provisionStatus" yaml:"ProvisionStatus"`
+	CreatedAt                    time.Time              `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt                   time.Time              `json:"modifiedAt" yaml:"ModifiedAt"`
+	DeletedAt                    *time.Time             `json:"deletedAt" yaml:"DeletedAt,omitempty"`
+	Memory                       int                    `json:"memory" yaml:"Memory"`
+	CPU                          int                    `json:"cpu" yaml:"CPU"`
+	IPWhitelist                  []IpWhitelistResponse  `json:"ipWhitelist" yaml:"IPWhitelist,omitempty"`
+	AmeOIDC                      bool                   `json:"ameOIDC" yaml:"AmeOIDC"`
+	DeleteProtection             bool                   `json:"deleteProtection" yaml:"DeleteProtection"`
+	Addons                       map[string]APIAddon    `json:"addons" yaml:"Addons,omitempty"`
+	ObservabilityTenant          *ObservabilityTenant   `json:"observabilityTenant,omitempty" yaml:"ObservabilityTenant,omitempty"`
+	EnvironmentPrometheusRules   bool                   `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
 }
 
+// IpWhitelistResponse represents the response structure for IP whitelist information.
 type IpWhitelistResponse struct {
 	Cidr        string `json:"cidr" yaml:"Cidr"`
 	Description string `json:"description" yaml:"Description"`
 }
 
+// CloudAccountReference represents a reference to a cloud account.
 type CloudAccountReference struct {
 	Identity    string `json:"identity" yaml:"Identity"`
 	DisplayName string `json:"displayName" yaml:"DisplayName"`
 }
 
+// CloudCredentialsReference represents a reference to cloud credentials.
 type CloudCredentialsReference struct {
 	Identity    string `json:"identity" yaml:"Identity"`
 	DisplayName string `json:"displayName" yaml:"DisplayName"`
@@ -68,6 +75,7 @@ func (c Cluster) FullIdentifier() string {
 	return fmt.Sprintf("%s/%s/%s (%s)", c.CustomerSlug, c.EnvironmentSlug, c.Slug, c.Identity)
 }
 
+// ClusterProvisionStatus represents the status of a cluster provision process.
 type ClusterProvisionStatus string
 
 const (
@@ -80,11 +88,13 @@ const (
 	DONE                           ClusterProvisionStatus = "DONE"
 )
 
+// APIAddon represents an API addon.
 type APIAddon struct {
 	Enabled      bool              `json:"enabled" yaml:"Enabled"`
 	CustomValues map[string]string `json:"customValues,omitempty" yaml:"CustomValues,omitempty"`
 }
 
+// CreateCluster represents the configuration for creating a cluster.
 type CreateCluster struct {
 	Name                 string `json:"name" yaml:"Name"`
 	EnvironmentID        string `json:"environmentId" yaml:"EnvironmentId"`
@@ -94,13 +104,15 @@ type CreateCluster struct {
 
 	Version       string `json:"version,omitempty" yaml:"Version,omitempty"`
 	UpdateChannel string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
+	CNI           string `json:"cni" yaml:"CNI"`
 
-	EnableNATGateway             bool `json:"enableNATGateway" yaml:"EnableNATGateway"`
-	EnableNetworkEncryption      bool `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
-	EnablePodSecurityStandards   bool `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
-	EnableMultiAvailabilityZones bool `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
-	EnableAutoUpgrade            bool `json:"enableAutoUpgrade" yaml:"EnableAutoUpgrade"`
-	EnableHighAvailability       bool `json:"enableHighAvailability" yaml:"EnableHighAvailability"`
+	EnableNATGateway             bool   `json:"enableNATGateway" yaml:"EnableNATGateway"`
+	EnableNetworkEncryption      bool   `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
+	EnablePodSecurityStandards   bool   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
+	PodSecurityStandardsProfile  string `json:"podSecurityStandardsProfile" yaml:"PodSecurityStandardsProfile"`
+	EnableMultiAvailabilityZones bool   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
+	EnableAutoUpgrade            bool   `json:"enableAutoUpgrade" yaml:"EnableAutoUpgrade"`
+	EnableHighAvailability       bool   `json:"enableHighAvailability" yaml:"EnableHighAvailability"`
 
 	ServiceSubnet    string `json:"serviceSubnet,omitempty" yaml:"ServiceSubnet,omitempty"`
 	ClusterPodSubnet string `json:"clusterPodSubnet,omitempty" yaml:"ClusterPodSubnet,omitempty"`
@@ -110,22 +122,28 @@ type CreateCluster struct {
 	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 }
 
+// IPWhitelistEntry represents an entry in the IP whitelist.
 type IPWhitelistEntry struct {
 	Cidr        string `json:"cidr" yaml:"Cidr"`
 	Description string `json:"description,omitempty" yaml:"Description,omitempty"`
 }
 
+// UpdateCluster represents the data structure for updating a cluster.
 type UpdateCluster struct {
-	Status                     string              `json:"status,omitempty" yaml:"Status,omitempty"`
-	Version                    string              `json:"version,omitempty" yaml:"Version,omitempty"`
-	UpdateChannel              string              `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
-	EnableNetworkProxy         *bool               `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
-	EnableNetworkEncryption    *bool               `json:"enableNetworkEncryption,omitempty" yaml:"EnableNetworkEncryption,omitempty"`
-	EnableAutoUpgrade          *bool               `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
-	EnableHighAvailability     *bool               `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
-	EnablePodSecurityStandards *bool               `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
-	IPWhitelist                []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
-	Addons                     map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	Status                  string  `json:"status,omitempty" yaml:"Status,omitempty"`
+	Version                 string  `json:"version,omitempty" yaml:"Version,omitempty"`
+	CNI                     *string `json:"cni,omitempty" yaml:"CNI,omitempty"`
+	UpdateChannel           string  `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
+	EnableNetworkProxy      *bool   `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
+	EnableNetworkEncryption *bool   `json:"enableNetworkEncryption,omitempty" yaml:"EnableNetworkEncryption,omitempty"`
+	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
+	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
+	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
+	EnablePodSecurityStandards  *bool               `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
+	PodSecurityStandardsProfile *string             `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
+	DeleteProtection            *bool               `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
+	IPWhitelist                 []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	Addons                      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 }
 
 // NodePools is used by CreateCluster
@@ -138,6 +156,7 @@ type NodePools struct {
 	AvailabilityZone string `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
 }
 
+// NodePool represents a pool of nodes in a cluster.
 type NodePool struct {
 	ID                  int               `json:"id" yaml:"ID"`
 	Identity            string            `json:"identity" yaml:"Identity"`
@@ -160,12 +179,14 @@ type NodePool struct {
 	Cluster         Cluster `json:"-" yaml:"-"`                                       // adds a reference to Cluster for in-code
 }
 
+// NodeTaint represents a taint applied to a Kubernetes node.
 type NodeTaint struct {
-	Key    string `json:"key" yaml:"Key"`
-	Value  string `json:"value" yaml:"Value"`
-	Effect string `json:"effect" yaml:"Effect"`
+	Key    string `json:"key" yaml:"Key"`       // Key is the key of the taint.
+	Value  string `json:"value" yaml:"Value"`   // Value is the value of the taint.
+	Effect string `json:"effect" yaml:"Effect"` // Effect is the effect of the taint.
 }
 
+// NodePoolJoinConfig represents the configuration for joining a node pool. Only used for Bring Your Own Node cluster node pools.
 type NodePoolJoinConfig struct {
 	Versions                NodeJoinConfigVersions `json:"versions" yaml:"Versions"`
 	CloudInitUserDataBase64 string                 `json:"cloudInitUserDataBase64" yaml:"CloudInitUserDataBase64"`
@@ -175,6 +196,7 @@ type NodePoolJoinConfig struct {
 	KubeletConfigBase64     string                 `json:"kubeletConfigBase64" yaml:"KubeletConfigBase64"`
 }
 
+// NodeJoinConfigVersions represents the versions of various components used in the node join configuration. Only used for Bring Your Own Node cluster node pools.
 type NodeJoinConfigVersions struct {
 	CloudInit  string `json:"cloudInit" yaml:"CloudInit"`
 	Kubernetes string `json:"kubernetes" yaml:"Kubernetes"`
@@ -187,6 +209,7 @@ func (n NodePool) FullIdentifier() string {
 	return fmt.Sprintf("%s/%s/%s/%s (%d)", c.CustomerSlug, c.EnvironmentSlug, c.Slug, n.Name, n.ID)
 }
 
+// CreateNodePool represents the configuration for creating a node pool.
 type CreateNodePool struct {
 	Name                string            `json:"name" yaml:"Name"`
 	AvailabilityZone    string            `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
