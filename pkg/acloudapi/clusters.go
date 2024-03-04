@@ -189,6 +189,7 @@ func FixStatus(status string) string {
 type GetClusterOpts struct {
 	IncludeDetails *bool
 	ShowCompute    *bool
+	HideDeleted    *bool // admin-api only
 }
 
 func OptionalQueryParams(queryParams string) string {
@@ -211,6 +212,9 @@ func mergeGetClusterOpts(opts []GetClusterOpts, defaults GetClusterOpts) GetClus
 		if opt.ShowCompute != nil {
 			merged.ShowCompute = opt.ShowCompute
 		}
+		if opt.HideDeleted != nil {
+			merged.HideDeleted = opt.HideDeleted
+		}
 	}
 	return setDefaults(merged, defaults)
 }
@@ -220,7 +224,10 @@ func setDefaults(merged GetClusterOpts, defaults GetClusterOpts) GetClusterOpts 
 		merged.IncludeDetails = defaults.IncludeDetails
 	}
 	if merged.ShowCompute == nil {
-		merged.ShowCompute = defaults.IncludeDetails
+		merged.ShowCompute = defaults.ShowCompute
+	}
+	if merged.HideDeleted == nil {
+		merged.HideDeleted = defaults.HideDeleted
 	}
 	return merged
 }
@@ -235,6 +242,12 @@ func toQueryParams(mergedGetClusterOpts GetClusterOpts) string {
 			url = fmt.Sprintf("%s&", url)
 		}
 		url = fmt.Sprintf("%sshow-compute=%t", url, *mergedGetClusterOpts.ShowCompute)
+	}
+	if mergedGetClusterOpts.HideDeleted != nil {
+		if len(url) > 0 {
+			url = fmt.Sprintf("%s&", url)
+		}
+		url = fmt.Sprintf("%shideDeleted=%t", url, *mergedGetClusterOpts.HideDeleted)
 	}
 	return url
 }

@@ -44,6 +44,23 @@ type Cluster struct {
 	Addons                       map[string]APIAddon    `json:"addons" yaml:"Addons,omitempty"`
 	ObservabilityTenant          *ObservabilityTenant   `json:"observabilityTenant,omitempty" yaml:"ObservabilityTenant,omitempty"`
 	EnvironmentPrometheusRules   bool                   `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
+	MaintenanceSchedule          *MaintenanceSchedule   `json:"maintenanceSchedule,omitempty" yaml:"MaintenanceSchedule,omitempty"`
+}
+
+type MaintenanceSchedule struct {
+	Identity           string              `json:"identity" yaml:"Identity"`
+	Name               string              `json:"name" yaml:"nName"`
+	MaintenanceWindows []MaintenanceWindow `json:"windows" yaml:"MaintenanceWindows"`
+}
+
+type MaintenanceWindow struct {
+	Day       string `json:"day" yaml:"Day"`
+	StartTime string `json:"startTime" yaml:"StartTime"`
+	Duration  int    `json:"duration" yaml:"duration"`
+}
+
+func (m MaintenanceWindow) String() string {
+	return fmt.Sprintf("%s %s %d minutes", m.Day, m.StartTime, m.Duration)
 }
 
 // IpWhitelistResponse represents the response structure for IP whitelist information.
@@ -347,4 +364,47 @@ type SilenceMatcher struct {
 	Value   string `json:"value" yaml:"Value"`
 	IsRegex bool   `json:"isRegex" yaml:"IsRegex"`
 	IsEqual bool   `json:"isEqual" yaml:"IsEqual"`
+}
+
+type ScheduledClusterUpgrade struct {
+	Identity           string                        `json:"identity" yaml:"Identity"`
+	ClusterIdentity    string                        `json:"clusterIdentity" yaml:"ClusterIdentity"`
+	CreatedAt          time.Time                     `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt         time.Time                     `json:"modifiedAt" yaml:"ModifiedAt"`
+	WindowStart        time.Time                     `json:"windowStart" yaml:"WindowStart"`
+	WindowEnd          time.Time                     `json:"windowEnd" yaml:"WindowEnd"`
+	FromClusterVersion string                        `json:"fromClusterVersion" yaml:"FromClusterVersion"`
+	ToClusterVersion   string                        `json:"toClusterVersion" yaml:"ToClusterVersion"`
+	Status             ScheduledClusterUpgradeStatus `json:"status" yaml:"Status"`
+}
+
+type ScheduledClusterUpgradeStatus string
+
+const (
+	Scheduled         ScheduledClusterUpgradeStatus = "SCHEDULED"
+	ScheduledNotified ScheduledClusterUpgradeStatus = "SCHEDULED_NOTIFIED"
+	Updated           ScheduledClusterUpgradeStatus = "UPDATED"
+	Succeeded         ScheduledClusterUpgradeStatus = "SUCCEEDED"
+	Cancelled         ScheduledClusterUpgradeStatus = "CANCELLED"
+	Superseded        ScheduledClusterUpgradeStatus = "SUPERSEDED"
+	Failed            ScheduledClusterUpgradeStatus = "FAILED"
+	Missed            ScheduledClusterUpgradeStatus = "MISSED"
+)
+
+type CreateScheduledClusterUpgradeRequest struct {
+	ClusterIdentity    string    `json:"clusterIdentity"`
+	WindowStart        time.Time `json:"windowStart"`
+	WindowEnd          time.Time `json:"windowEnd"`
+	FromClusterVersion string    `json:"fromClusterVersion"`
+	ToClusterVersion   string    `json:"toClusterVersion"`
+}
+
+type UpdateScheduledClusterUpgradeRequest struct {
+	Identity string                        `json:"identity"`
+	Status   ScheduledClusterUpgradeStatus `json:"status"`
+}
+
+type ListScheduledClusterUpgradesOpts struct {
+	ClusterIdentities []string
+	Statuses          []ScheduledClusterUpgradeStatus
 }
