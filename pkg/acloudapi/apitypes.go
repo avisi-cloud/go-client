@@ -104,12 +104,12 @@ type CreateCluster struct {
 
 	Version       string `json:"version,omitempty" yaml:"Version,omitempty"`
 	UpdateChannel string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
-	CNI           string `json:"cni" yaml:"CNI"`
+	CNI           string `json:"cni,omitempty" yaml:"CNI,omitempty"`
 
 	EnableNATGateway             bool   `json:"enableNATGateway" yaml:"EnableNATGateway"`
 	EnableNetworkEncryption      bool   `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
 	EnablePodSecurityStandards   bool   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
-	PodSecurityStandardsProfile  string `json:"podSecurityStandardsProfile" yaml:"PodSecurityStandardsProfile"`
+	PodSecurityStandardsProfile  string `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
 	EnableMultiAvailabilityZones bool   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
 	EnableAutoUpgrade            bool   `json:"enableAutoUpgrade" yaml:"EnableAutoUpgrade"`
 	EnableHighAvailability       bool   `json:"enableHighAvailability" yaml:"EnableHighAvailability"`
