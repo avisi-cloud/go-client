@@ -376,6 +376,7 @@ type ScheduledClusterUpgrade struct {
 	FromClusterVersion string                        `json:"fromClusterVersion" yaml:"FromClusterVersion"`
 	ToClusterVersion   string                        `json:"toClusterVersion" yaml:"ToClusterVersion"`
 	Status             ScheduledClusterUpgradeStatus `json:"status" yaml:"Status"`
+	Reason             string                        `json:"reason" yaml:"Reason"`
 }
 
 type ScheduledClusterUpgradeStatus string
@@ -402,6 +403,7 @@ type CreateScheduledClusterUpgradeRequest struct {
 type UpdateScheduledClusterUpgradeRequest struct {
 	Identity string                        `json:"identity"`
 	Status   ScheduledClusterUpgradeStatus `json:"status"`
+	Reason   string                        `json:"reason" yaml:"Reason"`
 }
 
 type ListScheduledClusterUpgradesOpts struct {
