@@ -55,7 +55,11 @@ type NodePoolsAPI interface {
 
 type CloudAccountsAPI interface {
 	GetCloudAccounts(ctx context.Context, org string) ([]CloudAccount, error)
+	CreateCloudAccount(ctx context.Context, org string, createCloudAccount CreateCloudAccount) (*CloudAccount, error)
+	UpdateCloudAccount(ctx context.Context, org, cloudAccount string, updateCloudAccount UpdateCloudAccount) (*CloudAccount, error)
+	DeleteCloudAccount(ctx context.Context, org, cloudAccount string) error
 	FindCloudAccountByName(ctx context.Context, org, name, cloudProvider string) (*CloudAccount, error)
+	GetCloudProfiles(ctx context.Context, org string) ([]CloudProfile, error)
 }
 
 type MembershipsAPI interface {
