@@ -132,13 +132,9 @@ func (c *clientImpl) DeleteCloudAccount(ctx context.Context, org, identity strin
 // The cloud profiles are used to create cloud accounts
 // The cloud profiles contain information about the cloud provider and the regions available
 func (c *clientImpl) GetCloudProfiles(ctx context.Context, org string) ([]CloudProfile, error) {
-	cloudProfiles := []CloudProfile{}
-	response, err := c.R().
-		SetContext(ctx).
-		SetResult(&cloudProfiles).
-		Get(fmt.Sprintf("/api/v1/orgs/%s/cloud-profiles", org))
-	if err := c.CheckResponse(response, err); err != nil {
+	pagedResult, err := c.GetPaged(ctx, fmt.Sprintf("/api/v1/orgs/%s/cloud-accounts", org))
+	if err != nil {
 		return nil, err
 	}
-	return cloudProfiles, nil
+	return MarshalPagedResultContent[CloudProfile](pagedResult)
 }
