@@ -60,6 +60,10 @@ type CloudAccountsAPI interface {
 	DeleteCloudAccount(ctx context.Context, org, cloudAccount string) error
 	FindCloudAccountByName(ctx context.Context, org, name, cloudProvider string) (*CloudAccount, error)
 	GetCloudProfiles(ctx context.Context, org string) ([]CloudProfile, error)
+
+	GetCloudCredentials(ctx context.Context, org, cloudAccountIdentity string) ([]CloudCredential, error)
+	CreateCloudCredential(ctx context.Context, org string, cloudAccount CloudAccount, create CreateCloudCredential) (*CloudCredential, error)
+	DeleteCloudCredential(ctx context.Context, org, cloudAccountIdentity, cloudCredentialIdentity string) error
 }
 
 type MembershipsAPI interface {
