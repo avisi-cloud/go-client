@@ -5,6 +5,21 @@ import (
 	"time"
 )
 
+type CloudProviderType string
+
+const (
+	CloudProviderEmpty        CloudProviderType = ""
+	CloudProviderNone         CloudProviderType = "none"
+	CloudProviderByon         CloudProviderType = "byon"
+	CloudProviderAWS          CloudProviderType = "aws"
+	CloudProviderAzure        CloudProviderType = "azure"
+	CloudProviderMultipass    CloudProviderType = "multipass"
+	CloudProviderOpenstack    CloudProviderType = "openstack"
+	CloudProviderDigitalOcean CloudProviderType = "digitalocean"
+	CloudProviderHetzner      CloudProviderType = "hetzner"
+	CloudProviderVSphere      CloudProviderType = "vsphere"
+)
+
 // Cluster represents the Cluster resource in the Avisi Cloud API
 type Cluster struct {
 	Name                    string                     `json:"name" yaml:"Name"`
