@@ -60,6 +60,7 @@ type Cluster struct {
 	ObservabilityTenant          *ObservabilityTenant   `json:"observabilityTenant,omitempty" yaml:"ObservabilityTenant,omitempty"`
 	EnvironmentPrometheusRules   bool                   `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
 	MaintenanceSchedule          *MaintenanceSchedule   `json:"maintenanceSchedule,omitempty" yaml:"MaintenanceSchedule,omitempty"`
+	AutoScalerSettings           map[string]string      `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoScalerSettings,omitempty"`
 }
 
 type MaintenanceSchedule struct {
@@ -152,6 +153,8 @@ type CreateCluster struct {
 	NodePools   []NodePools         `json:"nodePools" yaml:"NodePools"`
 	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
+
+	AutoScalerSettings map[string]string `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoScalerSettings,omitempty"`
 }
 
 // IPWhitelistEntry represents an entry in the IP whitelist.
@@ -176,6 +179,7 @@ type UpdateCluster struct {
 	DeleteProtection            *bool               `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
 	IPWhitelist                 []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons                      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	AutoScalerSettings          map[string]string   `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoScalerSettings,omitempty"`
 }
 
 // NodePools is used by CreateCluster
