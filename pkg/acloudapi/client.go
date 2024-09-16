@@ -93,6 +93,10 @@ type OrganisationAPI interface {
 	GetOrganisation(ctx context.Context, organisationSlug string) (*Organisation, error)
 }
 
+type UserAPI interface {
+	AddUser(ctx context.Context) (AddUserResponse, error)
+}
+
 type Client interface {
 	CloudAccountAPI
 	CloudProvidersAPI
@@ -105,6 +109,7 @@ type Client interface {
 	ObservabilityAPI
 	OrganisationAPI
 	CloudAccountsAPI
+	UserAPI
 
 	Resty() *resty.Client
 }
