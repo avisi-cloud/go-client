@@ -116,3 +116,5 @@ vendor
 
 # Golang
 .netrc
+
+go-client

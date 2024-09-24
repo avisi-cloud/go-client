@@ -152,6 +152,8 @@ type CreateCluster struct {
 	NodePools   []NodePools         `json:"nodePools" yaml:"NodePools"`
 	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
+
+	MaintenanceScheduleIdentity string `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 }
 
 // IPWhitelistEntry represents an entry in the IP whitelist.
@@ -176,6 +178,7 @@ type UpdateCluster struct {
 	DeleteProtection            *bool               `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
 	IPWhitelist                 []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons                      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	MaintenanceScheduleIdentity *string             `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 }
 
 // NodePools is used by CreateCluster
