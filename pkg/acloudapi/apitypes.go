@@ -400,14 +400,37 @@ type ScheduledClusterUpgrade struct {
 type ScheduledClusterUpgradeStatus string
 
 const (
-	Scheduled         ScheduledClusterUpgradeStatus = "SCHEDULED"
+	// Scheduled indicates that this cluster upgrade has been scheduled
+	// and is pending execution.
+	Scheduled ScheduledClusterUpgradeStatus = "SCHEDULED"
+
+	// ScheduledNotified indicates that this upgrade has been scheduled
+	// and the user has been notified of the planned upgrade.
 	ScheduledNotified ScheduledClusterUpgradeStatus = "SCHEDULED_NOTIFIED"
-	Updated           ScheduledClusterUpgradeStatus = "UPDATED"
-	Succeeded         ScheduledClusterUpgradeStatus = "SUCCEEDED"
-	Cancelled         ScheduledClusterUpgradeStatus = "CANCELLED"
-	Superseded        ScheduledClusterUpgradeStatus = "SUPERSEDED"
-	Failed            ScheduledClusterUpgradeStatus = "FAILED"
-	Missed            ScheduledClusterUpgradeStatus = "MISSED"
+
+	// InProgress signifies that the cluster upgrade is currently in progress
+	// but has not yet completed.
+	InProgress ScheduledClusterUpgradeStatus = "IN_PROGRESS"
+
+	// Succeeded indicates that the cluster upgrade has been completed successfully.
+	Succeeded ScheduledClusterUpgradeStatus = "SUCCEEDED"
+
+	// Skipped indicates that this version of the cluster upgrade has been skipped.
+	// The automatic upgrade process will not attempt to upgrade to a skipped version.
+	Skipped ScheduledClusterUpgradeStatus = "SKIPPED"
+
+	// Superseded means that this scheduled cluster upgrade has been superseded
+	// due to external factors, such as a change in the update channel version
+	// or a change in the cluster's status.
+	Superseded ScheduledClusterUpgradeStatus = "SUPERSEDED"
+
+	// Failed indicates that the scheduled cluster upgrade failed to meet the
+	// necessary success criteria within the allotted time frame.
+	Failed ScheduledClusterUpgradeStatus = "FAILED"
+
+	// Missed means that the scheduled cluster upgrade did not initiate
+	// within its designated time window.
+	Missed ScheduledClusterUpgradeStatus = "MISSED"
 )
 
 type CreateScheduledClusterUpgradeRequest struct {
