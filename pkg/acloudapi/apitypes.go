@@ -164,10 +164,10 @@ type IPWhitelistEntry struct {
 
 // UpdateCluster represents the data structure for updating a cluster.
 type UpdateCluster struct {
-	Status                  string  `json:"status,omitempty" yaml:"Status,omitempty"`
-	Version                 string  `json:"version,omitempty" yaml:"Version,omitempty"`
+	Status                  *string `json:"status,omitempty" yaml:"Status,omitempty"`
+	Version                 *string `json:"version,omitempty" yaml:"Version,omitempty"`
 	CNI                     *string `json:"cni,omitempty" yaml:"CNI,omitempty"`
-	UpdateChannel           string  `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
+	UpdateChannel           *string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
 	EnableNetworkProxy      *bool   `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
 	EnableNetworkEncryption *bool   `json:"enableNetworkEncryption,omitempty" yaml:"EnableNetworkEncryption,omitempty"`
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
