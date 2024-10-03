@@ -60,6 +60,7 @@ type Cluster struct {
 	ObservabilityTenant          *ObservabilityTenant   `json:"observabilityTenant,omitempty" yaml:"ObservabilityTenant,omitempty"`
 	EnvironmentPrometheusRules   bool                   `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
 	MaintenanceSchedule          *MaintenanceSchedule   `json:"maintenanceSchedule,omitempty" yaml:"MaintenanceSchedule,omitempty"`
+	AutoScalerSettings           *AutoscalingSettings   `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoScalerSettings,omitempty"`
 }
 
 type MaintenanceSchedule struct {
@@ -153,7 +154,8 @@ type CreateCluster struct {
 	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 
-	MaintenanceScheduleIdentity string `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	AutoScalerSettings          *AutoscalingSettings `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoScalerSettings,omitempty"`
+	MaintenanceScheduleIdentity string               `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 }
 
 // IPWhitelistEntry represents an entry in the IP whitelist.
@@ -173,12 +175,13 @@ type UpdateCluster struct {
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
 	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
 	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
-	EnablePodSecurityStandards  *bool               `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
-	PodSecurityStandardsProfile *string             `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
-	DeleteProtection            *bool               `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
-	IPWhitelist                 []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
-	Addons                      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
-	MaintenanceScheduleIdentity *string             `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	EnablePodSecurityStandards  *bool                `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
+	PodSecurityStandardsProfile *string              `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
+	DeleteProtection            *bool                `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
+	IPWhitelist                 []string             `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	Addons                      map[string]APIAddon  `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	AutoScalerSettings          *AutoscalingSettings `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoScalerSettings,omitempty"`
+	MaintenanceScheduleIdentity *string              `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 }
 
 // NodePools is used by CreateCluster
@@ -450,4 +453,21 @@ type UpdateScheduledClusterUpgradeRequest struct {
 type ListScheduledClusterUpgradesOpts struct {
 	ClusterIdentities []string
 	Statuses          []ScheduledClusterUpgradeStatus
+}
+
+type AutoscalingSettings struct {
+	// ScaleDownUtilizationThreshold specifies the scale down utilization threshold
+	ScaleDownUtilizationThreshold string `json:"scale-down-utilization-threshold"`
+	// ScaleDownGpuUtilizationThreshold specifies the scale down GPU utilization threshold
+	ScaleDownGpuUtilizationThreshold string `json:"scale-down-gpu-utilization-threshold"`
+	// ScaleDownDelayAfterAdd specifies the scale down delay after add
+	ScaleDownDelayAfterAdd string `json:"scale-down-delay-after-add"`
+	// ScaleDownUnneededTime specifies the scale down unneeded time
+	ScaleDownUnneededTime string `json:"scale-down-unneeded-time"`
+	// ScaleDownUnreadyTime specifies the scale down unready time
+	ScaleDownUnreadyTime string `json:"scale-down-unready-time"`
+	// MaxNodeProvisionTime specifies the max node provision time
+	MaxNodeProvisionTime string `json:"max-node-provision-time"`
+	// UnremovableNodeRecheckTimeout specifies the unremovable node recheck timeout
+	UnremovableNodeRecheckTimeout string `json:"unremovable-node-recheck-timeout"`
 }
