@@ -93,6 +93,18 @@ type OrganisationAPI interface {
 	GetOrganisation(ctx context.Context, organisationSlug string) (*Organisation, error)
 }
 
+type UserAPI interface {
+	AddUser(ctx context.Context) (AddUserResponse, error)
+}
+
+type MaintenanceAPI interface {
+	GetMaintenanceSchedules(ctx context.Context, org string) ([]MaintenanceSchedule, error)
+	GetMaintenanceSchedule(ctx context.Context, org, maintenanceScheduleID string) (*MaintenanceSchedule, error)
+	CreateMaintenanceSchedule(ctx context.Context, org string, createMaintenanceSchedule CreateMaintenanceSchedule) (*MaintenanceSchedule, error)
+	DeleteMaintenanceSchedule(ctx context.Context, org, maintenanceScheduleID string) error
+	UpdateMaintenanceSchedule(ctx context.Context, org, maintenanceScheduleID string, updateMaintenanceSchedule UpdateMaintenanceSchedule) (*MaintenanceSchedule, error)
+}
+
 type Client interface {
 	CloudAccountAPI
 	CloudProvidersAPI
@@ -105,6 +117,8 @@ type Client interface {
 	ObservabilityAPI
 	OrganisationAPI
 	CloudAccountsAPI
+	UserAPI
+	MaintenanceAPI
 
 	Resty() *resty.Client
 }
