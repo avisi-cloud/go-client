@@ -457,17 +457,17 @@ type ListScheduledClusterUpgradesOpts struct {
 
 type AutoscalerSettings struct {
 	// ScaleDownUtilizationThreshold specifies the scale down utilization threshold
-	ScaleDownUtilizationThreshold float64 `json:"scale-down-utilization-threshold"`
+	ScaleDownUtilizationThreshold float64 `json:"scale-down-utilization-threshold" yaml:"ScaleDownUtilizationThreshold"`
 	// ScaleDownGpuUtilizationThreshold specifies the scale down GPU utilization threshold
-	ScaleDownGpuUtilizationThreshold float64 `json:"scale-down-gpu-utilization-threshold"`
+	ScaleDownGpuUtilizationThreshold float64 `json:"scale-down-gpu-utilization-threshold" yaml:"ScaleDownGpuUtilizationThreshold"`
 	// ScaleDownDelayAfterAdd specifies the scale down delay after add
-	ScaleDownDelayAfterAdd string `json:"scale-down-delay-after-add"`
+	ScaleDownDelayAfterAdd string `json:"scale-down-delay-after-add" yaml:"ScaleDownDelayAfterAdd"`
 	// ScaleDownUnneededTime specifies the scale down unneeded time
-	ScaleDownUnneededTime string `json:"scale-down-unneeded-time"`
+	ScaleDownUnneededTime string `json:"scale-down-unneeded-time" yaml:"ScaleDownUnneededTime"`
 	// ScaleDownUnreadyTime specifies the scale down unready time
-	ScaleDownUnreadyTime string `json:"scale-down-unready-time"`
+	ScaleDownUnreadyTime string `json:"scale-down-unready-time" yaml:"ScaleDownUnreadyTime"`
 	// MaxNodeProvisionTime specifies the max node provision time
-	MaxNodeProvisionTime string `json:"max-node-provision-time"`
+	MaxNodeProvisionTime string `json:"max-node-provision-time" yaml:"MaxNodeProvisionTime"`
 	// UnremovableNodeRecheckTimeout specifies the unremovable node recheck timeout
-	UnremovableNodeRecheckTimeout string `json:"unremovable-node-recheck-timeout"`
+	UnremovableNodeRecheckTimeout string `json:"unremovable-node-recheck-timeout" yaml:"UnremovableNodeRecheckTimeout"`
 }
