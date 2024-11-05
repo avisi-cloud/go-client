@@ -457,9 +457,9 @@ type ListScheduledClusterUpgradesOpts struct {
 
 type AutoscalerSettings struct {
 	// ScaleDownUtilizationThreshold specifies the scale down utilization threshold
-	ScaleDownUtilizationThreshold string `json:"scale-down-utilization-threshold"`
+	ScaleDownUtilizationThreshold float64 `json:"scale-down-utilization-threshold"`
 	// ScaleDownGpuUtilizationThreshold specifies the scale down GPU utilization threshold
-	ScaleDownGpuUtilizationThreshold string `json:"scale-down-gpu-utilization-threshold"`
+	ScaleDownGpuUtilizationThreshold float64 `json:"scale-down-gpu-utilization-threshold"`
 	// ScaleDownDelayAfterAdd specifies the scale down delay after add
 	ScaleDownDelayAfterAdd string `json:"scale-down-delay-after-add"`
 	// ScaleDownUnneededTime specifies the scale down unneeded time
