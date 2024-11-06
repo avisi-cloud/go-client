@@ -457,17 +457,17 @@ type ListScheduledClusterUpgradesOpts struct {
 
 type AutoscalerSettings struct {
 	// ScaleDownUtilizationThreshold specifies the scale down utilization threshold
-	ScaleDownUtilizationThreshold float64 `json:"scale-down-utilization-threshold,omitempty" yaml:"ScaleDownUtilizationThreshold,omitempty"`
+	ScaleDownUtilizationThreshold *float64 `json:"scale-down-utilization-threshold,omitempty" yaml:"ScaleDownUtilizationThreshold,omitempty"`
 	// ScaleDownGpuUtilizationThreshold specifies the scale down GPU utilization threshold
-	ScaleDownGpuUtilizationThreshold float64 `json:"scale-down-gpu-utilization-threshold,omitempty" yaml:"ScaleDownGpuUtilizationThreshold,omitempty"`
+	ScaleDownGpuUtilizationThreshold *float64 `json:"scale-down-gpu-utilization-threshold,omitempty" yaml:"ScaleDownGpuUtilizationThreshold,omitempty"`
 	// ScaleDownDelayAfterAdd specifies the scale down delay after add
-	ScaleDownDelayAfterAdd string `json:"scale-down-delay-after-add,omitempty" yaml:"ScaleDownDelayAfterAdd,omitempty"`
+	ScaleDownDelayAfterAdd *string `json:"scale-down-delay-after-add,omitempty" yaml:"ScaleDownDelayAfterAdd,omitempty"`
 	// ScaleDownUnneededTime specifies the scale down unneeded time
-	ScaleDownUnneededTime string `json:"scale-down-unneeded-time,omitempty" yaml:"ScaleDownUnneededTime,omitempty"`
+	ScaleDownUnneededTime *string `json:"scale-down-unneeded-time,omitempty" yaml:"ScaleDownUnneededTime,omitempty"`
 	// ScaleDownUnreadyTime specifies the scale down unready time
-	ScaleDownUnreadyTime string `json:"scale-down-unready-time,omitempty" yaml:"ScaleDownUnreadyTime,omitempty"`
+	ScaleDownUnreadyTime *string `json:"scale-down-unready-time,omitempty" yaml:"ScaleDownUnreadyTime,omitempty"`
 	// MaxNodeProvisionTime specifies the max node provision time
-	MaxNodeProvisionTime string `json:"max-node-provision-time,omitempty" yaml:"MaxNodeProvisionTime,omitempty"`
+	MaxNodeProvisionTime *string `json:"max-node-provision-time,omitempty" yaml:"MaxNodeProvisionTime,omitempty"`
 	// UnremovableNodeRecheckTimeout specifies the unremovable node recheck timeout
-	UnremovableNodeRecheckTimeout string `json:"unremovable-node-recheck-timeout,omitempty" yaml:"UnremovableNodeRecheckTimeout,omitempty"`
+	UnremovableNodeRecheckTimeout *string `json:"unremovable-node-recheck-timeout,omitempty" yaml:"UnremovableNodeRecheckTimeout,omitempty"`
 }
