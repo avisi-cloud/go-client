@@ -57,7 +57,7 @@ func (c *adminClientImpl) UpdateScheduledClusterUpgrade(ctx context.Context, req
 		SetContext(ctx).
 		SetResult(&scheduledClusterUpgrade).
 		SetBody(&request).
-		Put(fmt.Sprintf("/admin/v1/scheduled-cluster-upgrades/%s", request.Identity))
+		Patch(fmt.Sprintf("/admin/v1/scheduled-cluster-upgrades/%s", request.Identity))
 	if err := c.CheckResponse(response, err); err != nil {
 		return nil, err
 	}

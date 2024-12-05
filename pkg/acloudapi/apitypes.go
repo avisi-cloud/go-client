@@ -388,21 +388,29 @@ type SilenceMatcher struct {
 }
 
 type ScheduledClusterUpgrade struct {
-	Identity           string                        `json:"identity" yaml:"Identity"`
-	ClusterIdentity    string                        `json:"clusterIdentity" yaml:"ClusterIdentity"`
-	CreatedAt          time.Time                     `json:"createdAt" yaml:"CreatedAt"`
-	ModifiedAt         time.Time                     `json:"modifiedAt" yaml:"ModifiedAt"`
-	WindowStart        time.Time                     `json:"windowStart" yaml:"WindowStart"`
-	WindowEnd          time.Time                     `json:"windowEnd" yaml:"WindowEnd"`
-	FromClusterVersion string                        `json:"fromClusterVersion" yaml:"FromClusterVersion"`
-	ToClusterVersion   string                        `json:"toClusterVersion" yaml:"ToClusterVersion"`
-	Status             ScheduledClusterUpgradeStatus `json:"status" yaml:"Status"`
-	Reason             string                        `json:"reason" yaml:"Reason"`
+	Identity                  string                        `json:"identity" yaml:"Identity"`
+	ClusterIdentity           string                        `json:"clusterIdentity" yaml:"ClusterIdentity"`
+	CreatedAt                 time.Time                     `json:"createdAt" yaml:"CreatedAt"`
+	ModifiedAt                time.Time                     `json:"modifiedAt" yaml:"ModifiedAt"`
+	WindowStart               time.Time                     `json:"windowStart" yaml:"WindowStart"`
+	WindowEnd                 time.Time                     `json:"windowEnd" yaml:"WindowEnd"`
+	FromClusterVersion        string                        `json:"fromClusterVersion" yaml:"FromClusterVersion"`
+	ToClusterVersion          string                        `json:"toClusterVersion" yaml:"ToClusterVersion"`
+	Status                    ScheduledClusterUpgradeStatus `json:"status" yaml:"Status"`
+	Reason                    string                        `json:"reason" yaml:"Reason"`
+	ScheduleRequestDate       time.Time                     `json:"scheduleRequestDate" yaml:"ScheduleRequestDate"`
+	IgnoreMaintenanceSchedule bool                          `json:"ignoreMaintenanceSchedule" yaml:"IgnoreMaintenanceSchedule"`
 }
 
 type ScheduledClusterUpgradeStatus string
 
 const (
+	// Requested represents the status where a cluster upgrade
+	// has been explicitly requested but not yet scheduled.
+	// This status is used to indicate that a new scheduled
+	// cluster upgrade has been initiated by the user or system.
+	Requested ScheduledClusterUpgradeStatus = "REQUESTED"
+
 	// Scheduled indicates that this cluster upgrade has been scheduled
 	// and is pending execution.
 	Scheduled ScheduledClusterUpgradeStatus = "SCHEDULED"
@@ -417,10 +425,6 @@ const (
 
 	// Succeeded indicates that the cluster upgrade has been completed successfully.
 	Succeeded ScheduledClusterUpgradeStatus = "SUCCEEDED"
-
-	// Skipped indicates that this version of the cluster upgrade has been skipped.
-	// The automatic upgrade process will not attempt to upgrade to a skipped version.
-	Skipped ScheduledClusterUpgradeStatus = "SKIPPED"
 
 	// Superseded means that this scheduled cluster upgrade has been superseded
 	// due to external factors, such as a change in the update channel version
@@ -445,9 +449,12 @@ type CreateScheduledClusterUpgradeRequest struct {
 }
 
 type UpdateScheduledClusterUpgradeRequest struct {
-	Identity string                        `json:"identity"`
-	Status   ScheduledClusterUpgradeStatus `json:"status"`
-	Reason   string                        `json:"reason" yaml:"Reason"`
+	Identity    string                        `json:"identity"`
+	Status      ScheduledClusterUpgradeStatus `json:"status,omitempty"`
+	Reason      string                        `json:"reason,omitempty"`
+	WindowStart *time.Time                    `json:"windowStart,omitempty"`
+	WindowEnd   *time.Time                    `json:"windowEnd,omitempty"`
+	Version     string                        `json:"version,omitempty"`
 }
 
 type ListScheduledClusterUpgradesOpts struct {
