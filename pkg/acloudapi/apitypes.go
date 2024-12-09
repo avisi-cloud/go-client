@@ -187,6 +187,7 @@ type UpdateCluster struct {
 // NodePools is used by CreateCluster
 type NodePools struct {
 	Name             string `json:"name" yaml:"Name"`
+	Identity         string `json:"identity" yaml:"Identity"`
 	AutoScaling      bool   `json:"autoScaling" yaml:"AutoScaling"`
 	MinSize          int    `json:"minSize" yaml:"MinSize"`
 	MaxSize          int    `json:"maxSize" yaml:"MaxSize"`
@@ -196,26 +197,39 @@ type NodePools struct {
 
 // NodePool represents a pool of nodes in a cluster.
 type NodePool struct {
-	ID                  int               `json:"id" yaml:"ID"`
-	Identity            string            `json:"identity" yaml:"Identity"`
-	Name                string            `json:"name" yaml:"Name"`
-	AvailabilityZone    string            `json:"availabilityZone" yaml:"AvailabilityZone,omitempty"`
-	NodeSize            string            `json:"nodeSize" yaml:"NodeSize"`
-	AutoScaling         bool              `json:"autoScaling" yaml:"AutoScaling"`
-	MinSize             int               `json:"minSize" yaml:"MinSize"`
-	MaxSize             int               `json:"maxSize" yaml:"MaxSize"`
-	NodeAutoReplacement bool              `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
-	Annotations         map[string]string `json:"annotations" yaml:"Annotations"`
-	Labels              map[string]string `json:"labels" yaml:"Labels"`
-	Taints              []NodeTaint       `json:"taints" yaml:"Taints"`
-	Status              string            `json:"status" yaml:"Status,omitempty"`
-	CreatedAt           time.Time         `json:"createdAt" yaml:"CreatedAt,omitempty"`
-	ModifiedAt          time.Time         `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
-	DeletedAt           *time.Time        `json:"deletedAt" yaml:"DeletedAt,omitempty"`
+	ID                  int                     `json:"id" yaml:"ID"`
+	Identity            string                  `json:"identity" yaml:"Identity"`
+	Name                string                  `json:"name" yaml:"Name"`
+	AvailabilityZone    string                  `json:"availabilityZone" yaml:"AvailabilityZone,omitempty"`
+	NodeSize            string                  `json:"nodeSize" yaml:"NodeSize"`
+	AutoScaling         bool                    `json:"autoScaling" yaml:"AutoScaling"`
+	MinSize             int                     `json:"minSize" yaml:"MinSize"`
+	MaxSize             int                     `json:"maxSize" yaml:"MaxSize"`
+	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
+	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
+	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
+	Labels              map[string]string       `json:"labels" yaml:"Labels"`
+	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
+	Status              string                  `json:"status" yaml:"Status,omitempty"`
+	CreatedAt           time.Time               `json:"createdAt" yaml:"CreatedAt,omitempty"`
+	ModifiedAt          time.Time               `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
+	DeletedAt           *time.Time              `json:"deletedAt" yaml:"DeletedAt,omitempty"`
 
 	ClusterIdentity string  `json:"clusterIdentity" yaml:"ClusterIdentity,omitempty"` // adds a reference to Cluster
 	Cluster         Cluster `json:"-" yaml:"-"`                                       // adds a reference to Cluster for in-code
 }
+
+// NodePoolUpgradeStrategy represents the upgrade strategy for a node pool.
+type NodePoolUpgradeStrategy string
+
+const (
+	NodePoolUpgradeStrategyNone                            NodePoolUpgradeStrategy = "NONE"
+	NodePoolUpgradeStrategyReplace                         NodePoolUpgradeStrategy = "REPLACE"
+	NodePoolUpgradeStrategyInPlace                         NodePoolUpgradeStrategy = "INPLACE"
+	NodePoolUpgradeStrategyInPlaceWithoutDrain             NodePoolUpgradeStrategy = "INPLACE_WITHOUT_DRAIN"
+	NodePoolUpgradeStrategyReplaceMinorInPlacePatch        NodePoolUpgradeStrategy = "REPLACE_MINOR_INPLACE_PATCH"
+	NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain NodePoolUpgradeStrategy = "REPLACE_MINOR_INPLACE_PATCH_WITHOUT_DRAIN"
+)
 
 // NodeTaint represents a taint applied to a Kubernetes node.
 type NodeTaint struct {
