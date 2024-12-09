@@ -186,35 +186,64 @@ type UpdateCluster struct {
 
 // NodePools is used by CreateCluster
 type NodePools struct {
-	Name             string `json:"name" yaml:"Name"`
-	AutoScaling      bool   `json:"autoScaling" yaml:"AutoScaling"`
-	MinSize          int    `json:"minSize" yaml:"MinSize"`
-	MaxSize          int    `json:"maxSize" yaml:"MaxSize"`
-	NodeSize         string `json:"nodeSize" yaml:"NodeSize"`
-	AvailabilityZone string `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
+	Name             string                  `json:"name" yaml:"Name"`
+	Identity         string                  `json:"identity" yaml:"Identity"`
+	AutoScaling      bool                    `json:"autoScaling" yaml:"AutoScaling"`
+	MinSize          int                     `json:"minSize" yaml:"MinSize"`
+	MaxSize          int                     `json:"maxSize" yaml:"MaxSize"`
+	NodeSize         string                  `json:"nodeSize" yaml:"NodeSize"`
+	AvailabilityZone string                  `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
+	UpgradeStrategy  NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
 }
 
 // NodePool represents a pool of nodes in a cluster.
 type NodePool struct {
-	ID                  int               `json:"id" yaml:"ID"`
-	Identity            string            `json:"identity" yaml:"Identity"`
-	Name                string            `json:"name" yaml:"Name"`
-	AvailabilityZone    string            `json:"availabilityZone" yaml:"AvailabilityZone,omitempty"`
-	NodeSize            string            `json:"nodeSize" yaml:"NodeSize"`
-	AutoScaling         bool              `json:"autoScaling" yaml:"AutoScaling"`
-	MinSize             int               `json:"minSize" yaml:"MinSize"`
-	MaxSize             int               `json:"maxSize" yaml:"MaxSize"`
-	NodeAutoReplacement bool              `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
-	Annotations         map[string]string `json:"annotations" yaml:"Annotations"`
-	Labels              map[string]string `json:"labels" yaml:"Labels"`
-	Taints              []NodeTaint       `json:"taints" yaml:"Taints"`
-	Status              string            `json:"status" yaml:"Status,omitempty"`
-	CreatedAt           time.Time         `json:"createdAt" yaml:"CreatedAt,omitempty"`
-	ModifiedAt          time.Time         `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
-	DeletedAt           *time.Time        `json:"deletedAt" yaml:"DeletedAt,omitempty"`
+	ID                  int                     `json:"id" yaml:"ID"`
+	Identity            string                  `json:"identity" yaml:"Identity"`
+	Name                string                  `json:"name" yaml:"Name"`
+	AvailabilityZone    string                  `json:"availabilityZone" yaml:"AvailabilityZone,omitempty"`
+	NodeSize            string                  `json:"nodeSize" yaml:"NodeSize"`
+	AutoScaling         bool                    `json:"autoScaling" yaml:"AutoScaling"`
+	MinSize             int                     `json:"minSize" yaml:"MinSize"`
+	MaxSize             int                     `json:"maxSize" yaml:"MaxSize"`
+	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
+	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
+	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
+	Labels              map[string]string       `json:"labels" yaml:"Labels"`
+	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
+	Status              string                  `json:"status" yaml:"Status,omitempty"`
+	CreatedAt           time.Time               `json:"createdAt" yaml:"CreatedAt,omitempty"`
+	ModifiedAt          time.Time               `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
+	DeletedAt           *time.Time              `json:"deletedAt" yaml:"DeletedAt,omitempty"`
 
 	ClusterIdentity string  `json:"clusterIdentity" yaml:"ClusterIdentity,omitempty"` // adds a reference to Cluster
 	Cluster         Cluster `json:"-" yaml:"-"`                                       // adds a reference to Cluster for in-code
+}
+
+// NodePoolUpgradeStrategy represents the upgrade strategy for a node pool.
+type NodePoolUpgradeStrategy string
+
+const (
+	NodePoolUpgradeStrategyReplace                         NodePoolUpgradeStrategy = "REPLACE"
+	NodePoolUpgradeStrategyInPlace                         NodePoolUpgradeStrategy = "INPLACE"
+	NodePoolUpgradeStrategyInPlaceWithoutDrain             NodePoolUpgradeStrategy = "INPLACE_WITHOUT_DRAIN"
+	NodePoolUpgradeStrategyReplaceMinorInPlacePatch        NodePoolUpgradeStrategy = "REPLACE_MINOR_INPLACE_PATCH"
+	NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain NodePoolUpgradeStrategy = "REPLACE_MINOR_INPLACE_PATCH_WITHOUT_DRAIN"
+)
+
+var nodePoolUpgradeStrategyMap = map[string]NodePoolUpgradeStrategy{
+	string(NodePoolUpgradeStrategyReplace):                         NodePoolUpgradeStrategyReplace,
+	string(NodePoolUpgradeStrategyInPlace):                         NodePoolUpgradeStrategyInPlace,
+	string(NodePoolUpgradeStrategyInPlaceWithoutDrain):             NodePoolUpgradeStrategyInPlaceWithoutDrain,
+	string(NodePoolUpgradeStrategyReplaceMinorInPlacePatch):        NodePoolUpgradeStrategyReplaceMinorInPlacePatch,
+	string(NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain): NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain,
+}
+
+func ParseNodePoolUpgradeStrategy(s string) (NodePoolUpgradeStrategy, error) {
+	if strategy, exists := nodePoolUpgradeStrategyMap[s]; exists {
+		return strategy, nil
+	}
+	return "", fmt.Errorf("unsupported upgrade strategy: %s", s)
 }
 
 // NodeTaint represents a taint applied to a Kubernetes node.
@@ -249,16 +278,17 @@ func (n NodePool) FullIdentifier() string {
 
 // CreateNodePool represents the configuration for creating a node pool.
 type CreateNodePool struct {
-	Name                string            `json:"name" yaml:"Name"`
-	AvailabilityZone    string            `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
-	NodeSize            string            `json:"nodeSize" yaml:"NodeSize"`
-	MinSize             int               `json:"minSize" yaml:"MinSize"`
-	MaxSize             int               `json:"maxSize" yaml:"MaxSize"`
-	AutoScaling         bool              `json:"autoScaling" yaml:"AutoScaling"`
-	NodeAutoReplacement bool              `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
-	Annotations         map[string]string `json:"annotations" yaml:"Annotations"`
-	Labels              map[string]string `json:"labels" yaml:"Labels"`
-	Taints              []NodeTaint       `json:"taints" yaml:"Taints"`
+	Name                string                  `json:"name" yaml:"Name"`
+	AvailabilityZone    string                  `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
+	NodeSize            string                  `json:"nodeSize" yaml:"NodeSize"`
+	MinSize             int                     `json:"minSize" yaml:"MinSize"`
+	MaxSize             int                     `json:"maxSize" yaml:"MaxSize"`
+	AutoScaling         bool                    `json:"autoScaling" yaml:"AutoScaling"`
+	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
+	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
+	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
+	Labels              map[string]string       `json:"labels" yaml:"Labels"`
+	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
 }
 
 type ClusterMetadataResponse struct {
