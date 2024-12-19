@@ -61,6 +61,14 @@ type Cluster struct {
 	EnvironmentPrometheusRules   bool                   `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
 	MaintenanceSchedule          *MaintenanceSchedule   `json:"maintenanceSchedule,omitempty" yaml:"MaintenanceSchedule,omitempty"`
 	AutoscalerSettings           *AutoscalerSettings    `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
+	UpstreamCluster              *UpstreamCluster       `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+}
+
+type UpstreamCluster struct {
+	Identity        string `json:"identity,omitempty" yaml:"Identity,omitempty"`
+	Slug            string `json:"slug,omitempty" yaml:"Slug,omitempty"`
+	EnvironmentSlug string `json:"environmentSlug,omitempty" yaml:"EnvironmentSlug,omitempty"`
+	Version         string `json:"version,omitempty" yaml:"Version,omitempty"`
 }
 
 type MaintenanceSchedule struct {
@@ -154,8 +162,14 @@ type CreateCluster struct {
 	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 
-	AutoscalerSettings          *AutoscalerSettings `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
-	MaintenanceScheduleIdentity string              `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
+	MaintenanceScheduleIdentity string                  `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	UpstreamClusterIdentity     string                  `json:"upstreamClusterIdentity,omitempty" yaml:"UpstreamClusterIdentity,omitempty"`
+	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+}
+
+type UpstreamClusterRequest struct {
+	Identity string `json:"identity,omitempty" yaml:"Identity,omitempty"`
 }
 
 // IPWhitelistEntry represents an entry in the IP whitelist.
@@ -175,13 +189,14 @@ type UpdateCluster struct {
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
 	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
 	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
-	EnablePodSecurityStandards  *bool               `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
-	PodSecurityStandardsProfile *string             `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
-	DeleteProtection            *bool               `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
-	IPWhitelist                 []string            `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
-	Addons                      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
-	AutoscalerSettings          *AutoscalerSettings `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
-	MaintenanceScheduleIdentity *string             `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	EnablePodSecurityStandards  *bool                   `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
+	PodSecurityStandardsProfile *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
+	DeleteProtection            *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
+	IPWhitelist                 []string                `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	Addons                      map[string]APIAddon     `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
+	MaintenanceScheduleIdentity *string                 `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
 }
 
 // NodePools is used by CreateCluster
