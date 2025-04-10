@@ -300,7 +300,7 @@ type CreateNodePool struct {
 	MaxSize             int                     `json:"maxSize" yaml:"MaxSize"`
 	AutoScaling         bool                    `json:"autoScaling" yaml:"AutoScaling"`
 	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
-	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
+	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy,omitempty" yaml:"UpgradeStrategy"`
 	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
 	Labels              map[string]string       `json:"labels" yaml:"Labels"`
 	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
