@@ -222,14 +222,14 @@ type NodePool struct {
 	MinSize             int                     `json:"minSize" yaml:"MinSize"`
 	MaxSize             int                     `json:"maxSize" yaml:"MaxSize"`
 	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
+	EnableNodeReboots   bool                    `json:"enableNodeReboots" yaml:"EnableNodeReboots"`
 	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
 	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
 	Labels              map[string]string       `json:"labels" yaml:"Labels"`
 	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
-	Status              string                  `json:"status" yaml:"Status,omitempty"`
+	ProvisionStatus     string                  `json:"provisionStatus" yaml:"ProvisionStatus,omitempty"`
 	CreatedAt           time.Time               `json:"createdAt" yaml:"CreatedAt,omitempty"`
 	ModifiedAt          time.Time               `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
-	DeletedAt           *time.Time              `json:"deletedAt" yaml:"DeletedAt,omitempty"`
 
 	ClusterIdentity string  `json:"clusterIdentity" yaml:"ClusterIdentity,omitempty"` // adds a reference to Cluster
 	Cluster         Cluster `json:"-" yaml:"-"`                                       // adds a reference to Cluster for in-code
@@ -246,17 +246,19 @@ const (
 	NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain NodePoolUpgradeStrategy = "REPLACE_MINOR_INPLACE_PATCH_WITHOUT_DRAIN"
 )
 
-var nodePoolUpgradeStrategyMap = map[string]NodePoolUpgradeStrategy{
-	string(NodePoolUpgradeStrategyReplace):                         NodePoolUpgradeStrategyReplace,
-	string(NodePoolUpgradeStrategyInPlace):                         NodePoolUpgradeStrategyInPlace,
-	string(NodePoolUpgradeStrategyInPlaceWithoutDrain):             NodePoolUpgradeStrategyInPlaceWithoutDrain,
-	string(NodePoolUpgradeStrategyReplaceMinorInPlacePatch):        NodePoolUpgradeStrategyReplaceMinorInPlacePatch,
-	string(NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain): NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain,
+var AllNodePoolUpgradeStrategies = []NodePoolUpgradeStrategy{
+	NodePoolUpgradeStrategyReplace,
+	NodePoolUpgradeStrategyInPlace,
+	NodePoolUpgradeStrategyInPlaceWithoutDrain,
+	NodePoolUpgradeStrategyReplaceMinorInPlacePatch,
+	NodePoolUpgradeStrategyReplaceMinorInPlacePatchNoDrain,
 }
 
 func ParseNodePoolUpgradeStrategy(s string) (NodePoolUpgradeStrategy, error) {
-	if strategy, exists := nodePoolUpgradeStrategyMap[s]; exists {
-		return strategy, nil
+	for _, strategy := range AllNodePoolUpgradeStrategies {
+		if string(strategy) == s {
+			return strategy, nil
+		}
 	}
 	return "", fmt.Errorf("unsupported upgrade strategy: %s", s)
 }
