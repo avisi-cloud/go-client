@@ -19,7 +19,7 @@ func NewPersonalAccessTokenAuthenticator(token string) Authenticator {
 }
 
 func (m *personalAccessTokenAuthenticator) Authenticate(c *resty.Client, r *resty.Request) error {
-	c.SetAuthScheme("Token")
-	c.SetAuthToken(m.token)
+	r.SetAuthScheme("Token")
+	r.SetAuthToken(m.token)
 	return nil
 }
