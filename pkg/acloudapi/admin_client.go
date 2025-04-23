@@ -28,11 +28,23 @@ type AdminUpdateChannelsAPI interface {
 	ListUpdateChannels(ctx context.Context) ([]UpdateChannelResponse, error)
 }
 
+type AdminClusterVersionsAPI interface {
+	ListClusterVersions(ctx context.Context) ([]AdminClusterVersion, error)
+	ListAvailableClusterVersions(ctx context.Context) ([]AdminClusterVersion, error)
+	ListHistoryClusterVersions(ctx context.Context) ([]AdminClusterVersion, error)
+
+	GetClusterVersion(ctx context.Context, version string) (*AdminClusterVersion, error)
+	UpdateClusterVersion(ctx context.Context, version string, request AdminUpdateClusterVersionRequest) (*AdminClusterVersion, error)
+	CreateClusterVersion(ctx context.Context, request AdminCreateClusterVersionRequest) (*AdminClusterVersion, error)
+	DeleteClusterVersion(ctx context.Context, version string) error
+}
+
 type AdminClient interface {
 	AdminClusterAPI
 	AdminOrganisationAPI
 	AdminScheduledClusterUpgradesAPI
 	AdminUpdateChannelsAPI
+	AdminClusterVersionsAPI
 
 	Resty() *resty.Client
 }
