@@ -6,4 +6,4 @@ toolchain go1.24.3
 
 require github.com/go-resty/resty/v2 v2.16.5
 
-require golang.org/x/net v0.36.0 // indirect
+require golang.org/x/net v0.38.0 // indirect
