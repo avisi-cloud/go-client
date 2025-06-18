@@ -73,7 +73,7 @@ type UpstreamCluster struct {
 
 type MaintenanceSchedule struct {
 	Identity           string              `json:"identity" yaml:"Identity"`
-	Name               string              `json:"name" yaml:"nName"`
+	Name               string              `json:"name" yaml:"Name"`
 	MaintenanceWindows []MaintenanceWindow `json:"windows" yaml:"MaintenanceWindows"`
 }
 
