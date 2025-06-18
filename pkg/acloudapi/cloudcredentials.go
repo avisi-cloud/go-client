@@ -132,7 +132,7 @@ func (c *clientImpl) CreateCloudCredential(ctx context.Context, org string, clou
 	credentials := CloudCredential{}
 	response, err := c.R().
 		SetContext(ctx).
-		SetResult(&cloudAccount).
+		SetResult(&credentials).
 		SetBody(&create).
 		Post(fmt.Sprintf("/api/v1/orgs/%s/cloud-accounts/%s/credentials/%s", org, cloudAccount.Identity, cloudType))
 	if err := c.CheckResponse(response, err); err != nil {
