@@ -39,7 +39,7 @@ clientOpts := acloudapi.ClientOpts{
 }
 ```
 
-Next, create a `NewCLient`, using the `Authenticator` and `ClientOpts` created in the previous steps:
+Next, create a `NewClient`, using the `Authenticator` and `ClientOpts` created in the previous steps:
 
 ```go
 c := acloudapi.NewClient(authenticator, clientOpts)
@@ -50,7 +50,7 @@ c := acloudapi.NewClient(authenticator, clientOpts)
 Full example:
 
 ```go
-personalAccessToken := os.Getenv("ACLOUD_PERSONAL_ACCESS_TOKEN")
+personalAccessToken := os.Getenv("ACLOUD_PAT")
 authenticator := acloudapi.NewPersonalAccessTokenAuthenticator(personalAccessToken)
 clientOpts := acloudapi.ClientOpts{
 	APIUrl: "https://example.com",
@@ -74,4 +74,4 @@ if err != nil {
 
 ## License
 
-[Apache 2.0 License 2.0](lICENSE)
+[Apache 2.0 License](LICENSE)
