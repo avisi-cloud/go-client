@@ -30,7 +30,7 @@ func (c *clientImpl) GetClusters(ctx context.Context, opts ...GetClusterOpts) ([
 				clusters: clustersByOrg,
 			}
 			if err != nil {
-				resp.err = fmt.Errorf("failed to get node-pools by cluster %s: %w", mbs.Slug, err)
+				resp.err = fmt.Errorf("failed to get clusters for organisation %s: %w", mbs.Slug, err)
 			}
 			responseChan <- resp
 			wg.Done()
