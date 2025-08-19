@@ -154,6 +154,13 @@ func NewDefaultRestyClient(authenticator Authenticator, opts ClientOpts, client 
 }
 
 func (c *RestyClient) CheckResponse(response *resty.Response, err error) error {
+	if response == nil {
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("no response received")
+	}
+
 	if c.opts.Trace {
 		fmt.Printf("~~~ TRACE %s %s%s ~~~\n", response.Request.Method, c.opts.APIUrl, response.Request.URL)
 		ti := response.Request.TraceInfo()
