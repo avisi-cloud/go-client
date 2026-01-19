@@ -3,6 +3,7 @@ package acloudapi
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 type CloudAccount struct {
@@ -69,7 +70,7 @@ func (c *clientImpl) GetCloudAccounts(ctx context.Context, org string) ([]CloudA
 }
 
 func (c *clientImpl) FindCloudAccountByName(ctx context.Context, org, name, cloudProvider string) (*CloudAccount, error) {
-	pagedResult, err := c.GetPaged(ctx, fmt.Sprintf("/api/v1/orgs/%s/cloud-accounts?display-name=%s&cloud-provider-slug=%s", org, name, cloudProvider))
+	pagedResult, err := c.GetPaged(ctx, fmt.Sprintf("/api/v1/orgs/%s/cloud-accounts?display-name=%s&cloud-provider-slug=%s", org, url.QueryEscape(name), cloudProvider))
 	if err != nil {
 		return nil, err
 	}
