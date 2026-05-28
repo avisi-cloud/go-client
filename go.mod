@@ -2,7 +2,7 @@ module github.com/avisi-cloud/go-client
 
 go 1.23.0
 
-toolchain go1.26.1
+toolchain go1.26.3
 
 require github.com/go-resty/resty/v2 v2.17.2
 
