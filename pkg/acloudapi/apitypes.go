@@ -209,6 +209,8 @@ type NodePools struct {
 	NodeSize         string                  `json:"nodeSize" yaml:"NodeSize"`
 	AvailabilityZone string                  `json:"availabilityZone,omitempty" yaml:"AvailabilityZone,omitempty"`
 	UpgradeStrategy  NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
+	// SecurityUpdatesOnJoin is omitted when empty: the server then defaults to OFF on create and keeps the stored value on update.
+	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin,omitempty" yaml:"SecurityUpdatesOnJoin,omitempty"`
 }
 
 // NodePool represents a pool of nodes in a cluster.
@@ -224,12 +226,15 @@ type NodePool struct {
 	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
 	EnableNodeReboots   bool                    `json:"enableNodeReboots" yaml:"EnableNodeReboots"`
 	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
-	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
-	Labels              map[string]string       `json:"labels" yaml:"Labels"`
-	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
-	ProvisionStatus     string                  `json:"provisionStatus" yaml:"ProvisionStatus,omitempty"`
-	CreatedAt           time.Time               `json:"createdAt" yaml:"CreatedAt,omitempty"`
-	ModifiedAt          time.Time               `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
+	// SecurityUpdatesOnJoin controls whether OS security updates are installed during node bring-up,
+	// before the node joins the cluster. Applies to the first join only, not to upgrades of existing nodes.
+	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin" yaml:"SecurityUpdatesOnJoin"`
+	Annotations           map[string]string             `json:"annotations" yaml:"Annotations"`
+	Labels                map[string]string             `json:"labels" yaml:"Labels"`
+	Taints                []NodeTaint                   `json:"taints" yaml:"Taints"`
+	ProvisionStatus       string                        `json:"provisionStatus" yaml:"ProvisionStatus,omitempty"`
+	CreatedAt             time.Time                     `json:"createdAt" yaml:"CreatedAt,omitempty"`
+	ModifiedAt            time.Time                     `json:"modifiedAt" yaml:"ModifiedAt,omitempty"`
 
 	ClusterIdentity string  `json:"clusterIdentity" yaml:"ClusterIdentity,omitempty"` // adds a reference to Cluster
 	Cluster         Cluster `json:"-" yaml:"-"`                                       // adds a reference to Cluster for in-code
@@ -261,6 +266,35 @@ func ParseNodePoolUpgradeStrategy(s string) (NodePoolUpgradeStrategy, error) {
 		}
 	}
 	return "", fmt.Errorf("unsupported upgrade strategy: %s", s)
+}
+
+// NodePoolSecurityUpdatesOnJoin represents whether OS security updates are installed during node bring-up,
+// before the node joins the cluster. Applies to the first join only, not to upgrades of existing nodes.
+type NodePoolSecurityUpdatesOnJoin string
+
+const (
+	// NodePoolSecurityUpdatesOnJoinOff disables installing OS security updates during node bring-up.
+	NodePoolSecurityUpdatesOnJoinOff NodePoolSecurityUpdatesOnJoin = "OFF"
+	// NodePoolSecurityUpdatesOnJoinInstall installs OS security updates during node bring-up, before the node joins the cluster.
+	NodePoolSecurityUpdatesOnJoinInstall NodePoolSecurityUpdatesOnJoin = "INSTALL"
+	// NodePoolSecurityUpdatesOnJoinInstallAndReboot installs OS security updates during node bring-up and,
+	// if required, reboots the node before it joins the cluster.
+	NodePoolSecurityUpdatesOnJoinInstallAndReboot NodePoolSecurityUpdatesOnJoin = "INSTALL_AND_REBOOT"
+)
+
+var AllNodePoolSecurityUpdatesOnJoin = []NodePoolSecurityUpdatesOnJoin{
+	NodePoolSecurityUpdatesOnJoinOff,
+	NodePoolSecurityUpdatesOnJoinInstall,
+	NodePoolSecurityUpdatesOnJoinInstallAndReboot,
+}
+
+func ParseNodePoolSecurityUpdatesOnJoin(s string) (NodePoolSecurityUpdatesOnJoin, error) {
+	for _, securityUpdatesOnJoin := range AllNodePoolSecurityUpdatesOnJoin {
+		if string(securityUpdatesOnJoin) == s {
+			return securityUpdatesOnJoin, nil
+		}
+	}
+	return "", fmt.Errorf("unsupported security updates on join value: %s", s)
 }
 
 // NodeTaint represents a taint applied to a Kubernetes node.
@@ -304,9 +338,14 @@ type CreateNodePool struct {
 	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
 	EnableNodeReboots   bool                    `json:"enableNodeReboots" yaml:"EnableNodeReboots"`
 	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy,omitempty" yaml:"UpgradeStrategy"`
-	Annotations         map[string]string       `json:"annotations" yaml:"Annotations"`
-	Labels              map[string]string       `json:"labels" yaml:"Labels"`
-	Taints              []NodeTaint             `json:"taints" yaml:"Taints"`
+	// SecurityUpdatesOnJoin controls whether OS security updates are installed during node bring-up,
+	// before the node joins the cluster (INSTALL_AND_REBOOT also reboots first if required).
+	// Applies to the first join only, not to upgrades of existing nodes.
+	// Omitted when empty: the server then defaults to OFF on create and keeps the stored value on update.
+	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin,omitempty" yaml:"SecurityUpdatesOnJoin,omitempty"`
+	Annotations           map[string]string             `json:"annotations" yaml:"Annotations"`
+	Labels                map[string]string             `json:"labels" yaml:"Labels"`
+	Taints                []NodeTaint                   `json:"taints" yaml:"Taints"`
 }
 
 type ClusterMetadataResponse struct {
