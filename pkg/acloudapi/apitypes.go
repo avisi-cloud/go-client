@@ -43,6 +43,7 @@ type Cluster struct {
 	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
 	EnablePodSecurityStandards   bool                   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
 	PodSecurityStandardsProfile  string                 `json:"podSecurityStandardsProfile" yaml:"PodSecurityStandardsProfile"`
+	NodePortAccess               NodePortAccess         `json:"nodePortAccess" yaml:"NodePortAccess"`
 	EnableMultiAvailAbilityZones bool                   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
 	EnableNATGateway             bool                   `json:"enableNATGateway" yaml:"EnableNATGateway"`
 	Status                       string                 `json:"status" yaml:"Status,omitempty"`
@@ -129,6 +130,30 @@ const (
 	DONE                           ClusterProvisionStatus = "DONE"
 )
 
+// NodePortAccess controls from where the NodePorts of the cluster nodes are reachable.
+type NodePortAccess string
+
+const (
+	NodePortAccessInternal  NodePortAccess = "internal"  // internal network only
+	NodePortAccessAllowlist NodePortAccess = "allowlist" // internal network and ipWhitelist
+	NodePortAccessPublic    NodePortAccess = "public"    // anywhere
+)
+
+var AllNodePortAccess = []NodePortAccess{
+	NodePortAccessInternal,
+	NodePortAccessAllowlist,
+	NodePortAccessPublic,
+}
+
+func ParseNodePortAccess(s string) (NodePortAccess, error) {
+	for _, nodePortAccess := range AllNodePortAccess {
+		if string(nodePortAccess) == s {
+			return nodePortAccess, nil
+		}
+	}
+	return "", fmt.Errorf("unsupported node port access value: %s", s)
+}
+
 // APIAddon represents an API addon.
 type APIAddon struct {
 	Enabled      bool              `json:"enabled" yaml:"Enabled"`
@@ -147,13 +172,14 @@ type CreateCluster struct {
 	UpdateChannel string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
 	CNI           string `json:"cni,omitempty" yaml:"CNI,omitempty"`
 
-	EnableNATGateway             bool   `json:"enableNATGateway" yaml:"EnableNATGateway"`
-	EnableNetworkEncryption      bool   `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
-	EnablePodSecurityStandards   bool   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
-	PodSecurityStandardsProfile  string `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
-	EnableMultiAvailabilityZones bool   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
-	EnableAutoUpgrade            bool   `json:"enableAutoUpgrade" yaml:"EnableAutoUpgrade"`
-	EnableHighAvailability       bool   `json:"enableHighAvailability" yaml:"EnableHighAvailability"`
+	EnableNATGateway             bool           `json:"enableNATGateway" yaml:"EnableNATGateway"`
+	EnableNetworkEncryption      bool           `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
+	EnablePodSecurityStandards   bool           `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
+	PodSecurityStandardsProfile  string         `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
+	NodePortAccess               NodePortAccess `json:"nodePortAccess,omitempty" yaml:"NodePortAccess,omitempty"`
+	EnableMultiAvailabilityZones bool           `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
+	EnableAutoUpgrade            bool           `json:"enableAutoUpgrade" yaml:"EnableAutoUpgrade"`
+	EnableHighAvailability       bool           `json:"enableHighAvailability" yaml:"EnableHighAvailability"`
 
 	ServiceSubnet    string `json:"serviceSubnet,omitempty" yaml:"ServiceSubnet,omitempty"`
 	ClusterPodSubnet string `json:"clusterPodSubnet,omitempty" yaml:"ClusterPodSubnet,omitempty"`
@@ -191,6 +217,7 @@ type UpdateCluster struct {
 	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
 	EnablePodSecurityStandards  *bool                   `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
 	PodSecurityStandardsProfile *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
+	NodePortAccess              *NodePortAccess         `json:"nodePortAccess,omitempty" yaml:"NodePortAccess,omitempty"` // nil: current value unchanged
 	DeleteProtection            *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
 	IPWhitelist                 []string                `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons                      map[string]APIAddon     `json:"addons,omitempty" yaml:"Addons,omitempty"`
