@@ -40,14 +40,17 @@ type Cluster struct {
 	AutoUpgrade             bool                       `json:"autoUpgrade" yaml:"AutoUpgrade"`
 	HighlyAvailable         bool                       `json:"highlyAvailable" yaml:"HighlyAvailable"`
 	EnableNetworkEncryption bool                       `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
-	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
+	// Deprecated: no longer returned by the API, use PodSecurityStandardsProfile instead.
 	EnablePodSecurityStandards   bool                   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
 	PodSecurityStandardsProfile  string                 `json:"podSecurityStandardsProfile" yaml:"PodSecurityStandardsProfile"`
 	EnableMultiAvailAbilityZones bool                   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
 	EnableNATGateway             bool                   `json:"enableNATGateway" yaml:"EnableNATGateway"`
+	ServiceSubnet                string                 `json:"serviceSubnet" yaml:"ServiceSubnet,omitempty"`
+	ClusterPodSubnet             string                 `json:"clusterPodSubnet" yaml:"ClusterPodSubnet,omitempty"`
 	Status                       string                 `json:"status" yaml:"Status,omitempty"`
 	DesiredStatus                string                 `json:"desiredStatus" yaml:"-"` // TODO: hidden for now in yaml since it is confusing
 	ProvisionStatus              ClusterProvisionStatus `json:"provisionStatus" yaml:"ProvisionStatus"`
+	ActualState                  *ActualClusterState    `json:"actualState,omitempty" yaml:"ActualState,omitempty"`
 	CreatedAt                    time.Time              `json:"createdAt" yaml:"CreatedAt"`
 	ModifiedAt                   time.Time              `json:"modifiedAt" yaml:"ModifiedAt"`
 	DeletedAt                    *time.Time             `json:"deletedAt" yaml:"DeletedAt,omitempty"`
@@ -62,9 +65,20 @@ type Cluster struct {
 	MaintenanceSchedule          *MaintenanceSchedule   `json:"maintenanceSchedule,omitempty" yaml:"MaintenanceSchedule,omitempty"`
 	AutoscalerSettings           *AutoscalerSettings    `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
 	UpstreamCluster              *UpstreamCluster       `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+	DownstreamClusters           []ClusterReference     `json:"downstreamClusters,omitempty" yaml:"DownstreamClusters,omitempty"`
 }
 
-type UpstreamCluster struct {
+// ActualClusterState represents the last observed state of a cluster.
+type ActualClusterState struct {
+	Status      string    `json:"status" yaml:"Status"`
+	Version     string    `json:"version" yaml:"Version"`
+	CollectedAt time.Time `json:"collectedAt" yaml:"CollectedAt"`
+}
+
+type UpstreamCluster = ClusterReference
+
+// ClusterReference represents a reference to another cluster.
+type ClusterReference struct {
 	Identity        string `json:"identity,omitempty" yaml:"Identity,omitempty"`
 	Slug            string `json:"slug,omitempty" yaml:"Slug,omitempty"`
 	EnvironmentSlug string `json:"environmentSlug,omitempty" yaml:"EnvironmentSlug,omitempty"`
@@ -95,14 +109,16 @@ type IpWhitelistResponse struct {
 
 // CloudAccountReference represents a reference to a cloud account.
 type CloudAccountReference struct {
-	Identity    string `json:"identity" yaml:"Identity"`
-	DisplayName string `json:"displayName" yaml:"DisplayName"`
+	Identity                string                     `json:"identity" yaml:"Identity"`
+	DisplayName             string                     `json:"displayName" yaml:"DisplayName"`
+	PrimaryCloudCredentials *CloudCredentialsReference `json:"primaryCloudCredentials,omitempty" yaml:"PrimaryCloudCredentials,omitempty"`
 }
 
 // CloudCredentialsReference represents a reference to cloud credentials.
 type CloudCredentialsReference struct {
 	Identity    string `json:"identity" yaml:"Identity"`
 	DisplayName string `json:"displayName" yaml:"DisplayName"`
+	IsPrimary   bool   `json:"isPrimary" yaml:"IsPrimary,omitempty"`
 }
 
 // Identifier returns the cluster identifier in the form of {organisation-slug}/{environment-slug}/{cluster-slug}
@@ -138,7 +154,6 @@ type APIAddon struct {
 // CreateCluster represents the configuration for creating a cluster.
 type CreateCluster struct {
 	Name                 string `json:"name" yaml:"Name"`
-	EnvironmentID        string `json:"environmentId" yaml:"EnvironmentId"`
 	Description          string `json:"description,omitempty" yaml:"Description,omitempty"`
 	CloudAccountIdentity string `json:"cloudAccountIdentity" yaml:"CloudAccountIdentity"`
 	Region               string `json:"region" yaml:"Region"`
@@ -164,8 +179,11 @@ type CreateCluster struct {
 
 	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
 	MaintenanceScheduleIdentity string                  `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
-	UpstreamClusterIdentity     string                  `json:"upstreamClusterIdentity,omitempty" yaml:"UpstreamClusterIdentity,omitempty"`
 	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+	// Deprecated: ignored by the API, the environment is set by the environmentSlug argument of CreateCluster.
+	EnvironmentID string `json:"environmentId" yaml:"EnvironmentId"`
+	// Deprecated: ignored by the API, use UpstreamCluster instead.
+	UpstreamClusterIdentity string `json:"upstreamClusterIdentity,omitempty" yaml:"UpstreamClusterIdentity,omitempty"`
 }
 
 type UpstreamClusterRequest struct {
@@ -184,7 +202,7 @@ type UpdateCluster struct {
 	Version                 *string `json:"version,omitempty" yaml:"Version,omitempty"`
 	CNI                     *string `json:"cni,omitempty" yaml:"CNI,omitempty"`
 	UpdateChannel           *string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
-	EnableNetworkProxy      *bool   `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
+	EnvironmentSlug         *string `json:"environmentSlug,omitempty" yaml:"EnvironmentSlug,omitempty"`
 	EnableNetworkEncryption *bool   `json:"enableNetworkEncryption,omitempty" yaml:"EnableNetworkEncryption,omitempty"`
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
 	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
@@ -192,11 +210,14 @@ type UpdateCluster struct {
 	EnablePodSecurityStandards  *bool                   `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
 	PodSecurityStandardsProfile *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
 	DeleteProtection            *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
-	IPWhitelist                 []string                `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	IPWhitelist                 []IPWhitelistEntry      `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons                      map[string]APIAddon     `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	CloudCredentialsIdentity    *string                 `json:"cloudCredentialsIdentity,omitempty" yaml:"CloudCredentialsIdentity,omitempty"`
 	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
 	MaintenanceScheduleIdentity *string                 `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+	// Deprecated: ignored by the API.
+	EnableNetworkProxy *bool `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
 }
 
 // NodePools is used by CreateCluster
