@@ -40,8 +40,7 @@ type Cluster struct {
 	AutoUpgrade             bool                       `json:"autoUpgrade" yaml:"AutoUpgrade"`
 	HighlyAvailable         bool                       `json:"highlyAvailable" yaml:"HighlyAvailable"`
 	EnableNetworkEncryption bool                       `json:"enableNetworkEncryption" yaml:"EnableNetworkEncryption"`
-	// Deprecated: no longer returned by the API, use PodSecurityStandardsProfile instead.
-	EnablePodSecurityStandards   bool                   `json:"enablePodSecurityStandards" yaml:"EnablePodSecurityStandards"`
+
 	PodSecurityStandardsProfile  string                 `json:"podSecurityStandardsProfile" yaml:"PodSecurityStandardsProfile"`
 	EnableMultiAvailAbilityZones bool                   `json:"enableMultiAvailabilityZones" yaml:"EnableMultiAvailabilityZones"`
 	EnableNATGateway             bool                   `json:"enableNATGateway" yaml:"EnableNATGateway"`
@@ -180,10 +179,6 @@ type CreateCluster struct {
 	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
 	MaintenanceScheduleIdentity string                  `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
-	// Deprecated: ignored by the API, the environment is set by the environmentSlug argument of CreateCluster.
-	EnvironmentID string `json:"environmentId" yaml:"EnvironmentId"`
-	// Deprecated: ignored by the API, use UpstreamCluster instead.
-	UpstreamClusterIdentity string `json:"upstreamClusterIdentity,omitempty" yaml:"UpstreamClusterIdentity,omitempty"`
 }
 
 type UpstreamClusterRequest struct {
@@ -206,8 +201,7 @@ type UpdateCluster struct {
 	EnableNetworkEncryption *bool   `json:"enableNetworkEncryption,omitempty" yaml:"EnableNetworkEncryption,omitempty"`
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
 	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
-	// Deprecated: replaced by PodSecurityStandardsProfile which offers support for selecting a specific default PSS profile. This setting does not do anything since Kubernetes v1.23
-	EnablePodSecurityStandards  *bool                   `json:"enablePodSecurityStandards,omitempty" yaml:"EnablePodSecurityStandards,omitempty"`
+
 	PodSecurityStandardsProfile *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
 	DeleteProtection            *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
 	IPWhitelist                 []IPWhitelistEntry      `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
@@ -216,8 +210,6 @@ type UpdateCluster struct {
 	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
 	MaintenanceScheduleIdentity *string                 `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
 	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
-	// Deprecated: ignored by the API.
-	EnableNetworkProxy *bool `json:"enableNetworkProxy,omitempty" yaml:"EnableNetworkProxy,omitempty"`
 }
 
 // NodePools is used by CreateCluster
