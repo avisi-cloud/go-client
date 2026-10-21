@@ -63,6 +63,7 @@ type Cluster struct {
 	ObservabilityTenant          *ObservabilityTenant   `json:"observabilityTenant,omitempty" yaml:"ObservabilityTenant,omitempty"`
 	EnvironmentPrometheusRules   bool                   `json:"environmentPrometheusRules" yaml:"EnvironmentPrometheusRules"`
 	MaintenanceSchedule          *MaintenanceSchedule   `json:"maintenanceSchedule,omitempty" yaml:"MaintenanceSchedule,omitempty"`
+	RebootMaintenanceSchedule    *MaintenanceSchedule   `json:"rebootMaintenanceSchedule,omitempty" yaml:"RebootMaintenanceSchedule,omitempty"`
 	AutoscalerSettings           *AutoscalerSettings    `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
 	UpstreamCluster              *UpstreamCluster       `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
 	DownstreamClusters           []ClusterReference     `json:"downstreamClusters,omitempty" yaml:"DownstreamClusters,omitempty"`
@@ -85,14 +86,24 @@ type ClusterReference struct {
 	Version         string `json:"version,omitempty" yaml:"Version,omitempty"`
 }
 
+// MaintenanceSchedule is a set of weekly maintenance windows. The day and start time of each window are local to
+// TimeZone.
 type MaintenanceSchedule struct {
-	Identity           string              `json:"identity" yaml:"Identity"`
-	Name               string              `json:"name" yaml:"Name"`
-	MaintenanceWindows []MaintenanceWindow `json:"windows" yaml:"MaintenanceWindows"`
+	Identity     string `json:"identity" yaml:"Identity"`
+	Name         string `json:"name" yaml:"Name"`
+	ClusterCount int    `json:"clusterCount" yaml:"ClusterCount"`
+	// TimeZone is the IANA time zone name (e.g. "Europe/Amsterdam") in which the windows are interpreted.
+	TimeZone                  string              `json:"timeZone" yaml:"TimeZone"`
+	MaintenanceWindows        []MaintenanceWindow `json:"windows" yaml:"MaintenanceWindows"`
+	DefaultForClusterUpgrades bool                `json:"defaultForClusterUpgrades" yaml:"DefaultForClusterUpgrades"`
+	DefaultForReboots         bool                `json:"defaultForReboots" yaml:"DefaultForReboots"`
 }
 
+// MaintenanceWindow is a weekly window that starts on Day at StartTime, local to the time zone of its schedule, and
+// lasts Duration minutes of real time. It may run past midnight into the next day.
 type MaintenanceWindow struct {
-	Day       string `json:"day" yaml:"Day"`
+	Day string `json:"day" yaml:"Day"`
+	// StartTime is the local start time in "HH:mm".
 	StartTime string `json:"startTime" yaml:"StartTime"`
 	Duration  int    `json:"duration" yaml:"duration"`
 }
@@ -202,9 +213,11 @@ type CreateCluster struct {
 	IPWhitelist []IPWhitelistEntry  `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
 	Addons      map[string]APIAddon `json:"addons,omitempty" yaml:"Addons,omitempty"`
 
-	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
-	MaintenanceScheduleIdentity string                  `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
-	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+	AutoscalerSettings          *AutoscalerSettings `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
+	MaintenanceScheduleIdentity string              `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	// RebootMaintenanceScheduleIdentity is the schedule for node reboots; empty: the organisation's default.
+	RebootMaintenanceScheduleIdentity string                  `json:"rebootMaintenanceScheduleIdentity,omitempty" yaml:"RebootMaintenanceScheduleIdentity,omitempty"`
+	UpstreamCluster                   *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
 }
 
 type UpstreamClusterRequest struct {
@@ -228,15 +241,16 @@ type UpdateCluster struct {
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
 	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
 
-	PodSecurityStandardsProfile *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
-	NodePortAccess              *NodePortAccess         `json:"nodePortAccess,omitempty" yaml:"NodePortAccess,omitempty"` // nil: current value unchanged
-	DeleteProtection            *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
-	IPWhitelist                 []IPWhitelistEntry      `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
-	Addons                      map[string]APIAddon     `json:"addons,omitempty" yaml:"Addons,omitempty"`
-	CloudCredentialsIdentity    *string                 `json:"cloudCredentialsIdentity,omitempty" yaml:"CloudCredentialsIdentity,omitempty"`
-	AutoscalerSettings          *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
-	MaintenanceScheduleIdentity *string                 `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
-	UpstreamCluster             *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
+	PodSecurityStandardsProfile       *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
+	NodePortAccess                    *NodePortAccess         `json:"nodePortAccess,omitempty" yaml:"NodePortAccess,omitempty"` // nil: current value unchanged
+	DeleteProtection                  *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
+	IPWhitelist                       []IPWhitelistEntry      `json:"ipWhitelist,omitempty" yaml:"IpWhitelist,omitempty"`
+	Addons                            map[string]APIAddon     `json:"addons,omitempty" yaml:"Addons,omitempty"`
+	CloudCredentialsIdentity          *string                 `json:"cloudCredentialsIdentity,omitempty" yaml:"CloudCredentialsIdentity,omitempty"`
+	AutoscalerSettings                *AutoscalerSettings     `json:"clusterAutoscalerSettings,omitempty" yaml:"ClusterAutoscalerSettings,omitempty"`
+	MaintenanceScheduleIdentity       *string                 `json:"maintenanceScheduleIdentity,omitempty" yaml:"MaintenanceScheduleIdentity,omitempty"`
+	RebootMaintenanceScheduleIdentity *string                 `json:"rebootMaintenanceScheduleIdentity,omitempty" yaml:"RebootMaintenanceScheduleIdentity,omitempty"` // nil: current value unchanged
+	UpstreamCluster                   *UpstreamClusterRequest `json:"upstreamCluster,omitempty" yaml:"UpstreamCluster,omitempty"`
 }
 
 // NodePools is used by CreateCluster
