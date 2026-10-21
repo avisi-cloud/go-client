@@ -76,6 +76,7 @@ func TestGetClusterResponseFields(t *testing.T) {
 func TestUpdateClusterRequestBody(t *testing.T) {
 	environmentSlug := "env2"
 	cloudCredentialsIdentity := "credentials2"
+	rebootMaintenanceScheduleIdentity := "schedule2"
 	tests := []struct {
 		name   string
 		update UpdateCluster
@@ -101,6 +102,15 @@ func TestUpdateClusterRequestBody(t *testing.T) {
 				},
 				"environmentSlug":          "env2",
 				"cloudCredentialsIdentity": "credentials2",
+			},
+		},
+		{
+			name: "rebootMaintenanceScheduleIdentity",
+			update: UpdateCluster{
+				RebootMaintenanceScheduleIdentity: &rebootMaintenanceScheduleIdentity,
+			},
+			want: map[string]any{
+				"rebootMaintenanceScheduleIdentity": "schedule2",
 			},
 		},
 	}

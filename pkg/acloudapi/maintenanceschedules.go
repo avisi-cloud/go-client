@@ -30,8 +30,12 @@ func (c *clientImpl) GetMaintenanceSchedule(ctx context.Context, org, maintenanc
 }
 
 type CreateMaintenanceSchedule struct {
-	Name    string              `json:"name"`
-	Windows []MaintenanceWindow `json:"windows"`
+	Name string `json:"name"`
+	// TimeZone is an IANA time zone name in which the windows are interpreted; empty: UTC.
+	TimeZone                  string              `json:"timeZone,omitempty"`
+	Windows                   []MaintenanceWindow `json:"windows"`
+	DefaultForClusterUpgrades bool                `json:"defaultForClusterUpgrades,omitempty"`
+	DefaultForReboots         bool                `json:"defaultForReboots,omitempty"`
 }
 
 func (c *clientImpl) CreateMaintenanceSchedule(ctx context.Context, org string, createMaintenanceSchedule CreateMaintenanceSchedule) (*MaintenanceSchedule, error) {
@@ -58,9 +62,15 @@ func (c *clientImpl) DeleteMaintenanceSchedule(ctx context.Context, org, mainten
 	return nil
 }
 
+// UpdateMaintenanceSchedule updates a schedule; empty or nil fields keep their current value.
 type UpdateMaintenanceSchedule struct {
-	Name    string              `json:"name"`
-	Windows []MaintenanceWindow `json:"windows"`
+	Name     string              `json:"name,omitempty"`
+	TimeZone *string             `json:"timeZone,omitempty"`
+	Windows  []MaintenanceWindow `json:"windows,omitempty"`
+	// DefaultForClusterUpgrades can only be set to true; the current default can't be unset.
+	DefaultForClusterUpgrades *bool `json:"defaultForClusterUpgrades,omitempty"`
+	// DefaultForReboots can only be set to true; the current default can't be unset.
+	DefaultForReboots *bool `json:"defaultForReboots,omitempty"`
 }
 
 func (c *clientImpl) UpdateMaintenanceSchedule(ctx context.Context, org, maintenanceScheduleID string, updateMaintenanceSchedule UpdateMaintenanceSchedule) (*MaintenanceSchedule, error) {
