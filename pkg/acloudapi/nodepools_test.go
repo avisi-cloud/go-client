@@ -128,3 +128,138 @@ func TestParseNodePoolSecurityUpdatesOnJoin(t *testing.T) {
 		}
 	})
 }
+
+func TestCreateNodePoolBootDisk(t *testing.T) {
+	volumeSize := 80
+	tests := []struct {
+		name                     string
+		bootDiskSource           NodePoolBootDiskSource
+		volumeSize               *int
+		wantBootDiskSourceInBody bool
+		wantVolumeSizeInBody     bool
+	}{
+		{
+			name:                     "unset is omitted from the request body",
+			wantBootDiskSourceInBody: false,
+			wantVolumeSizeInBody:     false,
+		},
+		{
+			name:                     "volume with a custom size",
+			bootDiskSource:           NodePoolBootDiskSourceVolume,
+			volumeSize:               &volumeSize,
+			wantBootDiskSourceInBody: true,
+			wantVolumeSizeInBody:     true,
+		},
+		{
+			name:                     "node-type-disk without a size",
+			bootDiskSource:           NodePoolBootDiskSourceNodeTypeDisk,
+			wantBootDiskSourceInBody: true,
+			wantVolumeSizeInBody:     false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var requestBody map[string]any
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/v1/orgs/org1/clusters/env1/cluster1/pools", func(w http.ResponseWriter, r *http.Request) {
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					t.Errorf("failed to read request body: %v", err)
+				}
+				if err := json.Unmarshal(body, &requestBody); err != nil {
+					t.Errorf("failed to unmarshal request body: %v", err)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintf(w, `{"id":1,"name":"pool1","bootDiskSource":%q,"volumeSize":80}`, NodePoolBootDiskSourceVolume)
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			c := &clientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+			cluster := Cluster{CustomerSlug: "org1", EnvironmentSlug: "env1", Slug: "cluster1"}
+			nodePool, err := c.CreateNodePool(context.Background(), cluster, CreateNodePool{
+				Name:           "pool1",
+				BootDiskSource: tt.bootDiskSource,
+				VolumeSize:     tt.volumeSize,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			gotBootDiskSource, inBody := requestBody["bootDiskSource"]
+			if inBody != tt.wantBootDiskSourceInBody {
+				t.Fatalf("bootDiskSource in request body = %v, want %v", inBody, tt.wantBootDiskSourceInBody)
+			}
+			if tt.wantBootDiskSourceInBody && gotBootDiskSource != string(tt.bootDiskSource) {
+				t.Fatalf("bootDiskSource in request body = %v, want %v", gotBootDiskSource, tt.bootDiskSource)
+			}
+			gotVolumeSize, inBody := requestBody["volumeSize"]
+			if inBody != tt.wantVolumeSizeInBody {
+				t.Fatalf("volumeSize in request body = %v, want %v", inBody, tt.wantVolumeSizeInBody)
+			}
+			if tt.wantVolumeSizeInBody && gotVolumeSize != float64(*tt.volumeSize) {
+				t.Fatalf("volumeSize in request body = %v, want %v", gotVolumeSize, *tt.volumeSize)
+			}
+			if nodePool.BootDiskSource != NodePoolBootDiskSourceVolume {
+				t.Fatalf("unexpected bootDiskSource in response: %v", nodePool.BootDiskSource)
+			}
+			if nodePool.VolumeSize == nil || *nodePool.VolumeSize != 80 {
+				t.Fatalf("unexpected volumeSize in response: %v", nodePool.VolumeSize)
+			}
+		})
+	}
+}
+
+func TestUpdateNodePoolBootDiskOmittedWhenUnset(t *testing.T) {
+	var rawBody []byte
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v1/orgs/org1/clusters/env1/cluster1/pools/1", func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			t.Errorf("failed to read request body: %v", err)
+		}
+		rawBody = body
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"id":1,"name":"pool1","bootDiskSource":null,"volumeSize":null}`)
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := &clientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+	cluster := Cluster{CustomerSlug: "org1", EnvironmentSlug: "env1", Slug: "cluster1"}
+	nodePool, err := c.UpdateNodePool(context.Background(), cluster, 1, CreateNodePool{Name: "pool1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if strings.Contains(string(rawBody), "bootDiskSource") || strings.Contains(string(rawBody), "volumeSize") {
+		t.Fatalf("expected bootDiskSource and volumeSize to be omitted from request body, got: %s", rawBody)
+	}
+	if nodePool.BootDiskSource != "" {
+		t.Fatalf("unexpected bootDiskSource in response: %v", nodePool.BootDiskSource)
+	}
+	if nodePool.VolumeSize != nil {
+		t.Fatalf("unexpected volumeSize in response: %v", *nodePool.VolumeSize)
+	}
+}
+
+func TestParseNodePoolBootDiskSource(t *testing.T) {
+	for _, bootDiskSource := range AllNodePoolBootDiskSources {
+		t.Run(string(bootDiskSource), func(t *testing.T) {
+			got, err := ParseNodePoolBootDiskSource(string(bootDiskSource))
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != bootDiskSource {
+				t.Fatalf("ParseNodePoolBootDiskSource() = %v, want %v", got, bootDiskSource)
+			}
+		})
+	}
+
+	for _, invalid := range []string{"invalid", "VOLUME", "NODE_TYPE_DISK", "NETWORK_VOLUME"} {
+		t.Run(invalid, func(t *testing.T) {
+			if _, err := ParseNodePoolBootDiskSource(invalid); err == nil {
+				t.Fatal("expected error")
+			}
+		})
+	}
+}
