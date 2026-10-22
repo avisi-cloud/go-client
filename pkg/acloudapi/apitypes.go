@@ -283,6 +283,8 @@ type NodePool struct {
 	// SecurityUpdatesOnJoin controls whether OS security updates are installed during node bring-up,
 	// before the node joins the cluster. Applies to the first join only, not to upgrades of existing nodes.
 	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin" yaml:"SecurityUpdatesOnJoin"`
+	BootDiskSource        NodePoolBootDiskSource        `json:"bootDiskSource" yaml:"BootDiskSource,omitempty"`
+	VolumeSize            *int                          `json:"volumeSize" yaml:"VolumeSize,omitempty"`
 	Annotations           map[string]string             `json:"annotations" yaml:"Annotations"`
 	Labels                map[string]string             `json:"labels" yaml:"Labels"`
 	Taints                []NodeTaint                   `json:"taints" yaml:"Taints"`
@@ -351,6 +353,28 @@ func ParseNodePoolSecurityUpdatesOnJoin(s string) (NodePoolSecurityUpdatesOnJoin
 	return "", fmt.Errorf("unsupported security updates on join value: %s", s)
 }
 
+// NodePoolBootDiskSource represents what the nodes of a node pool boot from. Only supported on OpenStack.
+type NodePoolBootDiskSource string
+
+const (
+	NodePoolBootDiskSourceVolume       NodePoolBootDiskSource = "volume"
+	NodePoolBootDiskSourceNodeTypeDisk NodePoolBootDiskSource = "node-type-disk"
+)
+
+var AllNodePoolBootDiskSources = []NodePoolBootDiskSource{
+	NodePoolBootDiskSourceVolume,
+	NodePoolBootDiskSourceNodeTypeDisk,
+}
+
+func ParseNodePoolBootDiskSource(s string) (NodePoolBootDiskSource, error) {
+	for _, bootDiskSource := range AllNodePoolBootDiskSources {
+		if string(bootDiskSource) == s {
+			return bootDiskSource, nil
+		}
+	}
+	return "", fmt.Errorf("unsupported boot disk source value: %s", s)
+}
+
 // NodeTaint represents a taint applied to a Kubernetes node.
 type NodeTaint struct {
 	Key    string `json:"key" yaml:"Key"`       // Key is the key of the taint.
@@ -397,6 +421,8 @@ type CreateNodePool struct {
 	// Applies to the first join only, not to upgrades of existing nodes.
 	// Omitted when empty: the server then defaults to OFF on create and keeps the stored value on update.
 	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin,omitempty" yaml:"SecurityUpdatesOnJoin,omitempty"`
+	BootDiskSource        NodePoolBootDiskSource        `json:"bootDiskSource,omitempty" yaml:"BootDiskSource,omitempty"`
+	VolumeSize            *int                          `json:"volumeSize,omitempty" yaml:"VolumeSize,omitempty"`
 	Annotations           map[string]string             `json:"annotations" yaml:"Annotations"`
 	Labels                map[string]string             `json:"labels" yaml:"Labels"`
 	Taints                []NodeTaint                   `json:"taints" yaml:"Taints"`
