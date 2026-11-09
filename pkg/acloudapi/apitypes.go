@@ -567,6 +567,15 @@ type ScheduledClusterUpgrade struct {
 	Reason                    string                        `json:"reason" yaml:"Reason"`
 	ScheduleRequestDate       time.Time                     `json:"scheduleRequestDate" yaml:"ScheduleRequestDate"`
 	IgnoreMaintenanceSchedule bool                          `json:"ignoreMaintenanceSchedule" yaml:"IgnoreMaintenanceSchedule"`
+	// StartedAt is when the upgrade first became IN_PROGRESS. It is set once and never changed afterwards.
+	StartedAt *time.Time `json:"startedAt,omitempty" yaml:"StartedAt,omitempty"`
+	// LastProgressAt is the last moment progress of the upgrade was observed.
+	LastProgressAt *time.Time `json:"lastProgressAt,omitempty" yaml:"LastProgressAt,omitempty"`
+	// Progress is a human-readable description of the upgrade progress.
+	Progress string `json:"progress,omitempty" yaml:"Progress,omitempty"`
+	// SucceededClusterVersion is the cluster version the upgrade succeeded with. It can be newer than
+	// ToClusterVersion, and is only set for SUCCEEDED records.
+	SucceededClusterVersion string `json:"succeededClusterVersion,omitempty" yaml:"SucceededClusterVersion,omitempty"`
 }
 
 type ScheduledClusterUpgradeStatus string
@@ -590,6 +599,12 @@ const (
 	// but has not yet completed.
 	InProgress ScheduledClusterUpgradeStatus = "IN_PROGRESS"
 
+	// Stalled indicates that the cluster upgrade has started but has made no
+	// progress for a while. It is still an active upgrade: it returns to
+	// IN_PROGRESS when progress is observed again, and can still become
+	// SUCCEEDED or SUPERSEDED.
+	Stalled ScheduledClusterUpgradeStatus = "STALLED"
+
 	// Succeeded indicates that the cluster upgrade has been completed successfully.
 	Succeeded ScheduledClusterUpgradeStatus = "SUCCEEDED"
 
@@ -600,6 +615,9 @@ const (
 
 	// Failed indicates that the scheduled cluster upgrade failed to meet the
 	// necessary success criteria within the allotted time frame.
+	//
+	// Deprecated: Failed is only kept for historic records and is no longer set.
+	// Upgrades that make no progress become Stalled instead.
 	Failed ScheduledClusterUpgradeStatus = "FAILED"
 
 	// Missed means that the scheduled cluster upgrade did not initiate
@@ -622,6 +640,12 @@ type UpdateScheduledClusterUpgradeRequest struct {
 	WindowStart *time.Time                    `json:"windowStart,omitempty"`
 	WindowEnd   *time.Time                    `json:"windowEnd,omitempty"`
 	Version     string                        `json:"version,omitempty"`
+	// LastProgressAt is the last moment progress of the upgrade was observed.
+	// It may be sent without a status change.
+	LastProgressAt *time.Time `json:"lastProgressAt,omitempty"`
+	// Progress is a human-readable description of the upgrade progress.
+	// It may be sent without a status change.
+	Progress string `json:"progress,omitempty"`
 }
 
 type ListScheduledClusterUpgradesOpts struct {
