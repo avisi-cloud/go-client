@@ -37,6 +37,16 @@ func TestCreateNodePoolSecurityUpdatesOnJoin(t *testing.T) {
 			securityUpdatesOnJoin: NodePoolSecurityUpdatesOnJoinInstallAndReboot,
 			wantInBody:            true,
 		},
+		{
+			name:                  "upgrade",
+			securityUpdatesOnJoin: NodePoolSecurityUpdatesOnJoinUpgrade,
+			wantInBody:            true,
+		},
+		{
+			name:                  "upgrade-and-reboot",
+			securityUpdatesOnJoin: NodePoolSecurityUpdatesOnJoinUpgradeAndReboot,
+			wantInBody:            true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -121,6 +131,28 @@ func TestParseNodePoolSecurityUpdatesOnJoin(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("api values", func(t *testing.T) {
+		want := map[string]NodePoolSecurityUpdatesOnJoin{
+			"OFF":                NodePoolSecurityUpdatesOnJoinOff,
+			"INSTALL":            NodePoolSecurityUpdatesOnJoinInstall,
+			"INSTALL_AND_REBOOT": NodePoolSecurityUpdatesOnJoinInstallAndReboot,
+			"UPGRADE":            NodePoolSecurityUpdatesOnJoinUpgrade,
+			"UPGRADE_AND_REBOOT": NodePoolSecurityUpdatesOnJoinUpgradeAndReboot,
+		}
+		if len(AllNodePoolSecurityUpdatesOnJoin) != len(want) {
+			t.Fatalf("AllNodePoolSecurityUpdatesOnJoin has %d values, want %d", len(AllNodePoolSecurityUpdatesOnJoin), len(want))
+		}
+		for s, wantValue := range want {
+			got, err := ParseNodePoolSecurityUpdatesOnJoin(s)
+			if err != nil {
+				t.Fatalf("ParseNodePoolSecurityUpdatesOnJoin(%q): unexpected error: %v", s, err)
+			}
+			if got != wantValue {
+				t.Fatalf("ParseNodePoolSecurityUpdatesOnJoin(%q) = %v, want %v", s, got, wantValue)
+			}
+		}
+	})
 
 	t.Run("invalid", func(t *testing.T) {
 		if _, err := ParseNodePoolSecurityUpdatesOnJoin("invalid"); err == nil {

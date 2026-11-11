@@ -280,8 +280,8 @@ type NodePool struct {
 	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
 	EnableNodeReboots   bool                    `json:"enableNodeReboots" yaml:"EnableNodeReboots"`
 	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy" yaml:"UpgradeStrategy"`
-	// SecurityUpdatesOnJoin controls whether OS security updates are installed during node bring-up,
-	// before the node joins the cluster. Applies to the first join only, not to upgrades of existing nodes.
+	// SecurityUpdatesOnJoin controls which OS package updates a new node installs during bring-up,
+	// before it joins the cluster. Applies to the first join only, not to upgrades of existing nodes.
 	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin" yaml:"SecurityUpdatesOnJoin"`
 	BootDiskSource        NodePoolBootDiskSource        `json:"bootDiskSource" yaml:"BootDiskSource,omitempty"`
 	VolumeSize            *int                          `json:"volumeSize" yaml:"VolumeSize,omitempty"`
@@ -324,24 +324,35 @@ func ParseNodePoolUpgradeStrategy(s string) (NodePoolUpgradeStrategy, error) {
 	return "", fmt.Errorf("unsupported upgrade strategy: %s", s)
 }
 
-// NodePoolSecurityUpdatesOnJoin represents whether OS security updates are installed during node bring-up,
-// before the node joins the cluster. Applies to the first join only, not to upgrades of existing nodes.
+// NodePoolSecurityUpdatesOnJoin represents which OS package updates a new node installs during bring-up,
+// before it joins the cluster: none, the security updates only, or all pending package updates,
+// optionally followed by a reboot when the updates require it.
+// Applies to the first join only, not to upgrades of existing nodes.
 type NodePoolSecurityUpdatesOnJoin string
 
 const (
-	// NodePoolSecurityUpdatesOnJoinOff disables installing OS security updates during node bring-up.
+	// NodePoolSecurityUpdatesOnJoinOff installs no OS package updates during node bring-up. This is the default.
 	NodePoolSecurityUpdatesOnJoinOff NodePoolSecurityUpdatesOnJoin = "OFF"
-	// NodePoolSecurityUpdatesOnJoinInstall installs OS security updates during node bring-up, before the node joins the cluster.
+	// NodePoolSecurityUpdatesOnJoinInstall installs only the OS security updates during node bring-up,
+	// before the node joins the cluster.
 	NodePoolSecurityUpdatesOnJoinInstall NodePoolSecurityUpdatesOnJoin = "INSTALL"
-	// NodePoolSecurityUpdatesOnJoinInstallAndReboot installs OS security updates during node bring-up and,
+	// NodePoolSecurityUpdatesOnJoinInstallAndReboot installs only the OS security updates during node bring-up and,
 	// if required, reboots the node before it joins the cluster.
 	NodePoolSecurityUpdatesOnJoinInstallAndReboot NodePoolSecurityUpdatesOnJoin = "INSTALL_AND_REBOOT"
+	// NodePoolSecurityUpdatesOnJoinUpgrade installs all pending OS package updates during node bring-up,
+	// including non-security updates, before the node joins the cluster.
+	NodePoolSecurityUpdatesOnJoinUpgrade NodePoolSecurityUpdatesOnJoin = "UPGRADE"
+	// NodePoolSecurityUpdatesOnJoinUpgradeAndReboot installs all pending OS package updates during node bring-up,
+	// including non-security updates, and, if required, reboots the node before it joins the cluster.
+	NodePoolSecurityUpdatesOnJoinUpgradeAndReboot NodePoolSecurityUpdatesOnJoin = "UPGRADE_AND_REBOOT"
 )
 
 var AllNodePoolSecurityUpdatesOnJoin = []NodePoolSecurityUpdatesOnJoin{
 	NodePoolSecurityUpdatesOnJoinOff,
 	NodePoolSecurityUpdatesOnJoinInstall,
 	NodePoolSecurityUpdatesOnJoinInstallAndReboot,
+	NodePoolSecurityUpdatesOnJoinUpgrade,
+	NodePoolSecurityUpdatesOnJoinUpgradeAndReboot,
 }
 
 func ParseNodePoolSecurityUpdatesOnJoin(s string) (NodePoolSecurityUpdatesOnJoin, error) {
@@ -416,8 +427,8 @@ type CreateNodePool struct {
 	NodeAutoReplacement bool                    `json:"enableNodeAutoReplacement" yaml:"EnableNodeAutoReplacement"`
 	EnableNodeReboots   bool                    `json:"enableNodeReboots" yaml:"EnableNodeReboots"`
 	UpgradeStrategy     NodePoolUpgradeStrategy `json:"upgradeStrategy,omitempty" yaml:"UpgradeStrategy"`
-	// SecurityUpdatesOnJoin controls whether OS security updates are installed during node bring-up,
-	// before the node joins the cluster (INSTALL_AND_REBOOT also reboots first if required).
+	// SecurityUpdatesOnJoin controls which OS package updates a new node installs during bring-up,
+	// before it joins the cluster (the *_AND_REBOOT values also reboot first if required).
 	// Applies to the first join only, not to upgrades of existing nodes.
 	// Omitted when empty: the server then defaults to OFF on create and keeps the stored value on update.
 	SecurityUpdatesOnJoin NodePoolSecurityUpdatesOnJoin `json:"securityUpdatesOnJoin,omitempty" yaml:"SecurityUpdatesOnJoin,omitempty"`
