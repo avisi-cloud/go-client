@@ -51,6 +51,7 @@ func (c *adminClientImpl) UpdateCluster(ctx context.Context, request AdminUpdate
 }
 
 type AdminUpdateClusterRequest struct {
-	ClusterIdentity string `json:"clusterIdentity"`
-	Version         string `json:"version"`
+	ClusterIdentity string       `json:"clusterIdentity"`
+	Version         string       `json:"version"`
+	Type            *ClusterType `json:"type,omitempty"`
 }

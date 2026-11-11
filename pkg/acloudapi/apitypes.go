@@ -31,6 +31,7 @@ type Cluster struct {
 	Slug                    string                     `json:"slug" yaml:"Slug"`
 	CNI                     string                     `json:"cni" yaml:"CNI"`
 	Description             string                     `json:"description" yaml:"Description,omitempty"`
+	Type                    ClusterType                `json:"type" yaml:"Type"`
 	CloudProvider           string                     `json:"cloudProvider" yaml:"CloudProvider"`
 	CloudAccount            *CloudAccountReference     `json:"cloudAccount" yaml:"CloudAccount,omitempty"`
 	CloudCredentials        *CloudCredentialsReference `json:"cloudCredentials" yaml:"CloudCredentials,omitempty"`
@@ -156,6 +157,35 @@ const (
 	DONE                           ClusterProvisionStatus = "DONE"
 )
 
+// ClusterType is the type of a cluster, e.g. whether it runs production workloads. The values are the same as the
+// types of an environment.
+type ClusterType string
+
+const (
+	ClusterTypeProduction  ClusterType = "production"
+	ClusterTypeStaging     ClusterType = "staging"
+	ClusterTypeDevelopment ClusterType = "development"
+	ClusterTypeDemo        ClusterType = "demo"
+	ClusterTypeOther       ClusterType = "other"
+)
+
+var AllClusterTypes = []ClusterType{
+	ClusterTypeProduction,
+	ClusterTypeStaging,
+	ClusterTypeDevelopment,
+	ClusterTypeDemo,
+	ClusterTypeOther,
+}
+
+func ParseClusterType(s string) (ClusterType, error) {
+	for _, clusterType := range AllClusterTypes {
+		if string(clusterType) == s {
+			return clusterType, nil
+		}
+	}
+	return "", fmt.Errorf("unsupported cluster type: %s", s)
+}
+
 // NodePortAccess controls from where the NodePorts of the cluster nodes are reachable.
 type NodePortAccess string
 
@@ -192,6 +222,8 @@ type CreateCluster struct {
 	Description          string `json:"description,omitempty" yaml:"Description,omitempty"`
 	CloudAccountIdentity string `json:"cloudAccountIdentity" yaml:"CloudAccountIdentity"`
 	Region               string `json:"region" yaml:"Region"`
+	// Type is the type of the cluster; empty: the type of its environment.
+	Type ClusterType `json:"type,omitempty" yaml:"Type,omitempty"`
 
 	Version       string `json:"version,omitempty" yaml:"Version,omitempty"`
 	UpdateChannel string `json:"updateChannel,omitempty" yaml:"UpdateChannel,omitempty"`
@@ -241,6 +273,7 @@ type UpdateCluster struct {
 	EnableAutoUpgrade       *bool   `json:"enableAutoUpgrade,omitempty" yaml:"EnableAutoUpgrade,omitempty"`
 	EnableHighAvailability  *bool   `json:"enableHighAvailability,omitempty" yaml:"EnableHighAvailability,omitempty"`
 
+	Type                              *ClusterType            `json:"type,omitempty" yaml:"Type,omitempty"` // nil: current value unchanged
 	PodSecurityStandardsProfile       *string                 `json:"podSecurityStandardsProfile,omitempty" yaml:"PodSecurityStandardsProfile,omitempty"`
 	NodePortAccess                    *NodePortAccess         `json:"nodePortAccess,omitempty" yaml:"NodePortAccess,omitempty"` // nil: current value unchanged
 	DeleteProtection                  *bool                   `json:"deleteProtection,omitempty" yaml:"DeleteProtection,omitempty"`
