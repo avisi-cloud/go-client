@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -537,6 +538,17 @@ func TestUpdateClusterType(t *testing.T) {
 	}
 }
 
+func TestAllClusterTypes(t *testing.T) {
+	want := []string{"production", "staging", "test", "development", "demo", "other"}
+	got := make([]string, len(AllClusterTypes))
+	for i, clusterType := range AllClusterTypes {
+		got[i] = string(clusterType)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("AllClusterTypes = %v, want %v", got, want)
+	}
+}
+
 func TestParseClusterType(t *testing.T) {
 	for _, clusterType := range AllClusterTypes {
 		t.Run(string(clusterType), func(t *testing.T) {
@@ -550,7 +562,7 @@ func TestParseClusterType(t *testing.T) {
 		})
 	}
 
-	for _, invalid := range []string{"", "Production", "test"} {
+	for _, invalid := range []string{"", "Production", "testing"} {
 		t.Run("invalid "+invalid, func(t *testing.T) {
 			if _, err := ParseClusterType(invalid); err == nil {
 				t.Fatal("expected error")

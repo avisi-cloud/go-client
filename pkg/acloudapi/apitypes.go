@@ -164,6 +164,7 @@ type ClusterType string
 const (
 	ClusterTypeProduction  ClusterType = "production"
 	ClusterTypeStaging     ClusterType = "staging"
+	ClusterTypeTest        ClusterType = "test"
 	ClusterTypeDevelopment ClusterType = "development"
 	ClusterTypeDemo        ClusterType = "demo"
 	ClusterTypeOther       ClusterType = "other"
@@ -172,6 +173,7 @@ const (
 var AllClusterTypes = []ClusterType{
 	ClusterTypeProduction,
 	ClusterTypeStaging,
+	ClusterTypeTest,
 	ClusterTypeDevelopment,
 	ClusterTypeDemo,
 	ClusterTypeOther,
