@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -314,4 +315,258 @@ func TestParseNodePortAccess(t *testing.T) {
 			t.Fatal("expected error")
 		}
 	})
+}
+
+func TestGetClusterType(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v1/orgs/org1/clusters/env1/cluster1", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"slug":"cluster1","environmentSlug":"env1","type":%q}`, ClusterTypeProduction)
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := &clientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+	cluster, err := c.GetCluster(context.Background(), "org1", "env1", "cluster1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cluster.Type != ClusterTypeProduction {
+		t.Fatalf("unexpected type in response: %v", cluster.Type)
+	}
+}
+
+func TestAdminGetClusterType(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/admin/v1/clusters/cluster1", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"identity":"cluster1","slug":"cluster1","type":%q}`, ClusterTypeDemo)
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := &adminClientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+	cluster, err := c.GetCluster(context.Background(), "cluster1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cluster.Type != ClusterTypeDemo {
+		t.Fatalf("unexpected type in response: %v", cluster.Type)
+	}
+}
+
+func TestAdminUpdateClusterType(t *testing.T) {
+	tests := []struct {
+		name        string
+		clusterType *ClusterType
+		wantInBody  bool
+	}{
+		{
+			name:        "nil is omitted from the request body",
+			clusterType: nil,
+			wantInBody:  false,
+		},
+	}
+	for _, clusterType := range AllClusterTypes {
+		tests = append(tests, struct {
+			name        string
+			clusterType *ClusterType
+			wantInBody  bool
+		}{name: string(clusterType), clusterType: &clusterType, wantInBody: true})
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var requestBody map[string]any
+			mux := http.NewServeMux()
+			mux.HandleFunc("/admin/v1/clusters/cluster1", func(w http.ResponseWriter, r *http.Request) {
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					t.Errorf("failed to read request body: %v", err)
+				}
+				if err := json.Unmarshal(body, &requestBody); err != nil {
+					t.Errorf("failed to unmarshal request body: %v", err)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintf(w, `{"identity":"cluster1","slug":"cluster1","type":%q}`, ClusterTypeOther)
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			c := &adminClientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+			cluster, err := c.UpdateCluster(context.Background(), AdminUpdateClusterRequest{
+				ClusterIdentity: "cluster1",
+				Version:         "v1.33.1",
+				Type:            tt.clusterType,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if requestBody["version"] != "v1.33.1" {
+				t.Fatalf("version in request body = %v, want v1.33.1", requestBody["version"])
+			}
+			got, inBody := requestBody["type"]
+			if inBody != tt.wantInBody {
+				t.Fatalf("type in request body = %v, want %v", inBody, tt.wantInBody)
+			}
+			if tt.wantInBody && got != string(*tt.clusterType) {
+				t.Fatalf("type in request body = %v, want %v", got, *tt.clusterType)
+			}
+			if cluster.Type != ClusterTypeOther {
+				t.Fatalf("unexpected type in response: %v", cluster.Type)
+			}
+		})
+	}
+}
+
+func TestCreateClusterType(t *testing.T) {
+	tests := []struct {
+		name        string
+		clusterType ClusterType
+		wantInBody  bool
+	}{
+		{
+			name:        "unset is omitted from the request body",
+			clusterType: "",
+			wantInBody:  false,
+		},
+	}
+	for _, clusterType := range AllClusterTypes {
+		tests = append(tests, struct {
+			name        string
+			clusterType ClusterType
+			wantInBody  bool
+		}{name: string(clusterType), clusterType: clusterType, wantInBody: true})
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var requestBody map[string]any
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/v1/orgs/org1/clusters/env1", func(w http.ResponseWriter, r *http.Request) {
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					t.Errorf("failed to read request body: %v", err)
+				}
+				if err := json.Unmarshal(body, &requestBody); err != nil {
+					t.Errorf("failed to unmarshal request body: %v", err)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintf(w, `{"name":"cluster1","slug":"cluster1","type":%q}`, ClusterTypeStaging)
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			c := &clientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+			cluster, err := c.CreateCluster(context.Background(), "org1", "env1", CreateCluster{
+				Name: "cluster1",
+				Type: tt.clusterType,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			got, inBody := requestBody["type"]
+			if inBody != tt.wantInBody {
+				t.Fatalf("type in request body = %v, want %v", inBody, tt.wantInBody)
+			}
+			if tt.wantInBody && got != string(tt.clusterType) {
+				t.Fatalf("type in request body = %v, want %v", got, tt.clusterType)
+			}
+			if cluster.Type != ClusterTypeStaging {
+				t.Fatalf("unexpected type in response: %v", cluster.Type)
+			}
+		})
+	}
+}
+
+func TestUpdateClusterType(t *testing.T) {
+	tests := []struct {
+		name        string
+		clusterType *ClusterType
+		wantInBody  bool
+	}{
+		{
+			name:        "nil is omitted from the request body",
+			clusterType: nil,
+			wantInBody:  false,
+		},
+	}
+	for _, clusterType := range AllClusterTypes {
+		tests = append(tests, struct {
+			name        string
+			clusterType *ClusterType
+			wantInBody  bool
+		}{name: string(clusterType), clusterType: &clusterType, wantInBody: true})
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var requestBody map[string]any
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/v1/orgs/org1/clusters/env1/cluster1", func(w http.ResponseWriter, r *http.Request) {
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					t.Errorf("failed to read request body: %v", err)
+				}
+				if err := json.Unmarshal(body, &requestBody); err != nil {
+					t.Errorf("failed to unmarshal request body: %v", err)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintf(w, `{"name":"cluster1","slug":"cluster1","type":%q}`, ClusterTypeDevelopment)
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			c := &clientImpl{RestyClient: NewRestyClient(nil, ClientOpts{APIUrl: server.URL})}
+			cluster, err := c.UpdateCluster(context.Background(), "org1", "env1", "cluster1", UpdateCluster{
+				Type: tt.clusterType,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			got, inBody := requestBody["type"]
+			if inBody != tt.wantInBody {
+				t.Fatalf("type in request body = %v, want %v", inBody, tt.wantInBody)
+			}
+			if tt.wantInBody && got != string(*tt.clusterType) {
+				t.Fatalf("type in request body = %v, want %v", got, *tt.clusterType)
+			}
+			if cluster.Type != ClusterTypeDevelopment {
+				t.Fatalf("unexpected type in response: %v", cluster.Type)
+			}
+		})
+	}
+}
+
+func TestAllClusterTypes(t *testing.T) {
+	want := []string{"production", "staging", "test", "development", "demo", "other"}
+	got := make([]string, len(AllClusterTypes))
+	for i, clusterType := range AllClusterTypes {
+		got[i] = string(clusterType)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("AllClusterTypes = %v, want %v", got, want)
+	}
+}
+
+func TestParseClusterType(t *testing.T) {
+	for _, clusterType := range AllClusterTypes {
+		t.Run(string(clusterType), func(t *testing.T) {
+			got, err := ParseClusterType(string(clusterType))
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != clusterType {
+				t.Fatalf("ParseClusterType() = %v, want %v", got, clusterType)
+			}
+		})
+	}
+
+	for _, invalid := range []string{"", "Production", "testing"} {
+		t.Run("invalid "+invalid, func(t *testing.T) {
+			if _, err := ParseClusterType(invalid); err == nil {
+				t.Fatal("expected error")
+			}
+		})
+	}
 }
